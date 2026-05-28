@@ -183,6 +183,18 @@ export default function Footer() {
               <p className="text-gray-600 text-sm italic">
                 {t('footer.tagline')}
               </p>
+              <span className="hidden sm:inline text-gray-800">|</span>
+              <p className="text-gray-600 text-sm">
+                Created and designed by{' '}
+                <a
+                  href="https://rwextech.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-500 hover:text-[#DC2626] transition-colors font-medium underline decoration-gray-800 hover:decoration-[#DC2626] underline-offset-4"
+                >
+                  Rwex tech
+                </a>
+              </p>
               <button
                 onClick={scrollToTop}
                 className="bg-[#DC2626] hover:bg-[#B91C1C] text-white p-2 rounded-sm transition-colors"
