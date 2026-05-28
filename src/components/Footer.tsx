@@ -1,6 +1,6 @@
 'use client'
 
-import { Bike, Instagram, Facebook, MessageCircle, ArrowUp } from 'lucide-react'
+import { Instagram, Facebook, MessageCircle, ArrowUp } from 'lucide-react'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -18,17 +18,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Column 1 - Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="bg-[#DC2626] p-1.5 rounded-sm">
-                <Bike className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-white font-black text-xl tracking-wider">
-                MOKA <span className="text-[#DC2626]">MOTORS</span>
-              </span>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src="/images/logo.jpg"
+                alt="Sky Motors Logo"
+                className="h-14 w-auto object-contain rounded-sm"
+              />
             </div>
             <p className="text-gray-500 text-sm leading-relaxed mb-4">
               Your trusted partner for premium motorbikes and genuine spare parts in
-              Dar es Salaam, Tanzania. We are the solution for your problems. 😀
+              Dar es Salaam, Tanzania.
             </p>
             {/* Social Icons Row */}
             <div className="flex items-center gap-3">
@@ -181,7 +180,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <p className="text-gray-600 text-sm italic">
-                We are the solution for your problems. 😀
+                Sky Motors — Kariakoo, Dar es Salaam
               </p>
               <button
                 onClick={scrollToTop}

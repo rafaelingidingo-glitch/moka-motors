@@ -129,11 +129,11 @@ export default function HeroSection() {
 
       {/* Side text */}
       <div className="absolute right-8 top-1/2 -translate-y-1/2 z-10 hidden xl:block">
-        <p className="text-white/20 text-sm tracking-[0.3em] uppercase writing-mode-vertical"
-          style={{ writingMode: 'vertical-rl' }}
-        >
-          MOKA MOTORS — EST. DAR ES SALAAM
-        </p>
+        <img
+          src="/images/logo.jpg"
+          alt="Sky Motors"
+          className="h-20 w-auto object-contain rounded-sm opacity-30"
+        />
       </div>
     </section>
   )

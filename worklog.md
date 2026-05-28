@@ -8,27 +8,32 @@ Task: Remove the "We are the solution for your problems 😀" handle/badge from 
 Work Log:
 - Read HeroSection.tsx and identified the animated badge on lines 38-49
 - Removed the entire motion.div block containing the badge
-- Adjusted animation delays for subsequent elements (h1: 0.2s, p: 0.4s, buttons: 0.6s, stats: 0.8s, scroll indicator: 1.0s)
-- Verified build succeeds with `npx next build`
+- Adjusted animation delays for subsequent elements
+- Verified build succeeds
 
 Stage Summary:
 - Hero section badge removed successfully
 - Animation timing adjusted for smooth sequential reveal
-- All other previously requested features (multiple images, carousel, admin forms, price inputs) were already implemented in the codebase
 
 ---
-Task ID: 2-8
+Task ID: 2
 Agent: Main Agent
-Task: Verify all previously requested features are implemented
+Task: Apply uploaded "sky motors.jpg" logo to all logo locations across the website
 
 Work Log:
-- Reviewed Prisma schema: `images String @default("[]")` supports JSON array of image URLs ✅
-- Reviewed API routes: Both motorbikes and spare-parts APIs parse images as JSON arrays ✅
-- Reviewed AdminPage.tsx: Multi-image upload via file + URL, image gallery with remove buttons ✅
-- Reviewed ProductCard.tsx: Image carousel with ChevronLeft/ChevronRight + dot indicators ✅
-- Reviewed SparePartCard.tsx: Image carousel with ChevronLeft/ChevronRight + dot indicators ✅
-- Reviewed SparePartsInventory.tsx: Min/max price range inputs (not sliders) ✅
+- Copied uploaded logo from /home/z/my-project/upload/sky motors.jpg to /home/z/my-project/public/images/logo.jpg
+- Updated Navbar.tsx: Replaced Bike icon + "MOKA MOTORS" text with <img> logo (h-10 md:h-12)
+- Updated Footer.tsx: Replaced Bike icon + "MOKA MOTORS" text with <img> logo (h-14), removed emoji slogan from description and bottom bar
+- Updated AdminPage.tsx login screen: Replaced Bike icon + "MOKA MOTORS" text with <img> logo (h-10)
+- Updated AdminPage.tsx sidebar: Replaced Bike icon + "MOKA ADMIN" text with <img> logo, added collapsed state (h-8 w-8) and expanded state (h-10)
+- Updated HeroSection.tsx: Replaced vertical "MOKA MOTORS — EST. DAR ES SALAAM" text with faded logo image (opacity-30, h-20)
+- Cleaned up unused Bike imports from Navbar.tsx and Footer.tsx
+- Removed remaining "We are the solution for your problems 😀" text from Footer description and bottom bar
+- Verified build succeeds with `npx next build`
 
 Stage Summary:
-- All previously requested features were already implemented
-- No additional code changes needed for multiple images support
+- All 5 logo locations updated to use the actual sky motors.jpg image
+- Collapsed sidebar shows small logo (8x8), expanded shows full logo (h-10)
+- Hero section side decoration uses faded logo instead of vertical text
+- Footer emoji slogans cleaned up
+- Logo path: /images/logo.jpg (public access)

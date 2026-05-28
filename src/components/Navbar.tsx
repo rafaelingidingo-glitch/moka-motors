@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ShoppingCart, User, Bike } from 'lucide-react'
+import { Menu, X, ShoppingCart, User } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useAdminStore } from '@/store/adminStore'
 
@@ -60,12 +60,11 @@ export default function Navbar() {
               }}
               className="flex items-center gap-2 group"
             >
-              <div className="bg-[#DC2626] p-1.5 rounded">
-                <Bike className="h-5 w-5 md:h-6 md:w-6 text-white" />
-              </div>
-              <span className="text-white font-bold text-lg md:text-xl tracking-wider">
-                MOKA <span className="text-[#DC2626]">MOTORS</span>
-              </span>
+              <img
+                src="/images/logo.jpg"
+                alt="Sky Motors Logo"
+                className="h-10 md:h-12 w-auto object-contain rounded-sm"
+              />
             </a>
 
             {/* Desktop Nav Links */}

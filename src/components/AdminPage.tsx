@@ -449,13 +449,12 @@ export default function AdminPage() {
         </button>
 
         {/* Logo */}
-        <div className="absolute top-6 right-6 flex items-center gap-2">
-          <div className="bg-[#DC2626] p-1.5 rounded">
-            <Bike className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-white font-bold text-lg tracking-wider">
-            MOKA <span className="text-[#DC2626]">MOTORS</span>
-          </span>
+        <div className="absolute top-6 right-6">
+          <img
+            src="/images/logo.jpg"
+            alt="Sky Motors Logo"
+            className="h-10 w-auto object-contain rounded-sm"
+          />
         </div>
 
         <motion.div
@@ -555,15 +554,18 @@ export default function AdminPage() {
       <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-[#111111] border-r border-gray-800 flex flex-col transition-all duration-300 shrink-0`}>
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-800">
-          {sidebarOpen && (
-            <div className="flex items-center gap-2">
-              <div className="bg-[#DC2626] p-1.5 rounded">
-                <Bike className="h-4 w-4 text-white" />
-              </div>
-              <span className="text-white font-bold text-sm tracking-wider">
-                MOKA <span className="text-[#DC2626]">ADMIN</span>
-              </span>
-            </div>
+          {sidebarOpen ? (
+            <img
+              src="/images/logo.jpg"
+              alt="Sky Motors Logo"
+              className="h-10 w-auto object-contain rounded-sm"
+            />
+          ) : (
+            <img
+              src="/images/logo.jpg"
+              alt="Sky Motors Logo"
+              className="h-8 w-8 object-contain rounded-sm"
+            />
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
