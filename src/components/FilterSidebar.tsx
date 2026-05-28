@@ -282,25 +282,56 @@ export default function FilterSidebar({
             )}
           </button>
           {expandedSections.year && (
-            <div className="flex flex-wrap gap-2 mt-1">
-              {['2024', '2023', '2022', '2021', '2020'].map((yr) => (
-                <button
-                  key={yr}
-                  onClick={() =>
-                    onFilterChange({
-                      ...filters,
-                      year: filters.year === yr ? '' : yr,
-                    })
-                  }
-                  className={`px-4 py-2 rounded-sm text-sm font-semibold transition-all ${
-                    filters.year === yr
-                      ? 'bg-[#DC2626] text-white shadow-sm'
-                      : 'bg-[#F5F5F5] text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {yr}
-                </button>
-              ))}
+            <div className="mt-2 px-1 space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
+                    From Year
+                  </label>
+                  <input
+                    type="number"
+                    min={2000}
+                    max={2026}
+                    value={filters.year ? filters.year.split('-')[0] : ''}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      if (val === '' || (!isNaN(Number(val)) && Number(val) >= 0)) {
+                        const toYear = filters.year ? filters.year.split('-')[1] : ''
+                        onFilterChange({
+                          ...filters,
+                          year: val || toYear ? [val, toYear].filter(Boolean).join('-') : '',
+                        })
+                      }
+                    }}
+                    placeholder="e.g. 2020"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+                <span className="text-gray-300 mt-5">—</span>
+                <div className="flex-1">
+                  <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
+                    To Year
+                  </label>
+                  <input
+                    type="number"
+                    min={2000}
+                    max={2026}
+                    value={filters.year ? filters.year.split('-')[1] : ''}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      if (val === '' || (!isNaN(Number(val)) && Number(val) >= 0)) {
+                        const fromYear = filters.year ? filters.year.split('-')[0] : ''
+                        onFilterChange({
+                          ...filters,
+                          year: fromYear || val ? [fromYear, val].filter(Boolean).join('-') : '',
+                        })
+                      }
+                    }}
+                    placeholder="e.g. 2024"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>

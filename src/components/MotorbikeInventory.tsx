@@ -67,7 +67,19 @@ export default function MotorbikeInventory() {
       (b) => b.price >= filters.priceRange[0] && b.price <= filters.priceRange[1]
     )
     if (filters.year) {
-      result = result.filter((b) => String(b.year) === filters.year)
+      const yearParts = filters.year.split('-')
+      const fromYear = yearParts[0] ? Number(yearParts[0]) : null
+      const toYear = yearParts[1] ? Number(yearParts[1]) : null
+      result = result.filter((b) => {
+        if (fromYear && toYear) {
+          return b.year >= fromYear && b.year <= toYear
+        } else if (fromYear) {
+          return b.year >= fromYear
+        } else if (toYear) {
+          return b.year <= toYear
+        }
+        return true
+      })
     }
     if (filters.engineSize) {
       const parts = filters.engineSize.replace('cc', '').split('-')
