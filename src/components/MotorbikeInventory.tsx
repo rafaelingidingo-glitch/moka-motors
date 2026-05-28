@@ -146,7 +146,7 @@ export default function MotorbikeInventory() {
         </motion.div>
 
         {/* Layout: Sidebar + Grid */}
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Filter Sidebar */}
           <FilterSidebar
             type="motorbike"
@@ -166,7 +166,7 @@ export default function MotorbikeInventory() {
           {/* Main Content */}
           <div className="flex-1 min-w-0">
             {/* Toolbar */}
-            <div className="flex items-center justify-between mb-6 bg-white rounded-sm p-3 border border-gray-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 bg-white rounded-sm p-3 border border-gray-200 shadow-sm">
               <p className="text-sm text-gray-600">
                 Your search returned{' '}
                 <span className="font-black text-[#111111]">{filteredBikes.length}</span>{' '}
@@ -181,7 +181,7 @@ export default function MotorbikeInventory() {
                     onChange={(e) => setSort(e.target.value)}
                     className="text-sm border border-gray-200 rounded-sm px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#DC2626]"
                   >
-                    <option value="newest">Sort By: Newest First</option>
+                    <option value="newest">Newest First</option>
                     <option value="price-asc">Price: Low to High</option>
                     <option value="price-desc">Price: High to Low</option>
                     <option value="year-desc">Year: Newest</option>

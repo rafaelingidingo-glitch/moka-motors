@@ -367,13 +367,13 @@ export default function SparePartsInventory() {
         </motion.div>
 
         {/* Layout */}
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Mobile Filter Toggle */}
-          <div className="lg:hidden mb-4">
+          <div className="lg:hidden">
             <Button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               variant="outline"
-              className="flex items-center gap-2 border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-sm"
+              className="flex items-center gap-2 border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-sm w-full justify-center"
             >
               <SlidersHorizontal className="h-4 w-4" />
               Filters
@@ -392,7 +392,7 @@ export default function SparePartsInventory() {
                 className="absolute inset-0 bg-black/50"
                 onClick={() => setIsFilterOpen(false)}
               />
-              <div className="absolute left-0 top-0 bottom-0 w-80 bg-white shadow-2xl overflow-y-auto p-5">
+              <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-80 bg-white shadow-2xl overflow-y-auto p-5">
                 {filterContent}
               </div>
             </div>
@@ -408,7 +408,7 @@ export default function SparePartsInventory() {
           {/* Main Content */}
           <div className="flex-1 min-w-0">
             {/* Toolbar */}
-            <div className="flex items-center justify-between mb-6 bg-[#F5F5F5] rounded-sm p-3 border border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 bg-[#F5F5F5] rounded-sm p-3 border border-gray-200">
               <p className="text-sm text-gray-600">
                 Your search returned{' '}
                 <span className="font-black text-[#111111]">{filteredParts.length}</span>{' '}

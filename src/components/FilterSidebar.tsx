@@ -415,7 +415,7 @@ export default function FilterSidebar({
       {isOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={onToggle} />
-          <div className="absolute left-0 top-0 bottom-0 w-80 bg-white shadow-2xl overflow-y-auto p-5">
+          <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-80 bg-white shadow-2xl overflow-y-auto p-5">
             {filterContent}
           </div>
         </div>
