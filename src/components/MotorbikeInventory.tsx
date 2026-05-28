@@ -122,7 +122,7 @@ export default function MotorbikeInventory() {
   }, [bikes, filters, sort])
 
   return (
-    <section id="motorbikes" className="py-12 md:py-20 lg:py-28 bg-[#F5F5F5]">
+    <section id="motorbikes" className="py-12 md:py-20 lg:py-28 bg-[#F5F5F5]" style={{ overflowAnchor: 'none' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { ChevronDown, ChevronUp, X, SlidersHorizontal, Bike } from 'lucide-react'
@@ -56,22 +56,30 @@ export default function FilterSidebar({
     engineSize: false,
   })
 
+  // Pending filters: UI changes update this, only committed on "Apply Filter"
+  const [pendingFilters, setPendingFilters] = useState<FilterState>(filters)
+
+  // Sync pending filters when the parent filters change (e.g., on Clear All)
+  useEffect(() => {
+    setPendingFilters(filters)
+  }, [filters])
+
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }))
   }
 
   const toggleBrand = (brand: string) => {
-    const newBrands = filters.brands.includes(brand)
-      ? filters.brands.filter((b) => b !== brand)
-      : [...filters.brands, brand]
-    onFilterChange({ ...filters, brands: newBrands })
+    const newBrands = pendingFilters.brands.includes(brand)
+      ? pendingFilters.brands.filter((b) => b !== brand)
+      : [...pendingFilters.brands, brand]
+    setPendingFilters({ ...pendingFilters, brands: newBrands })
   }
 
   const toggleCategory = (category: string) => {
-    const newCats = filters.categories.includes(category)
-      ? filters.categories.filter((c) => c !== category)
-      : [...filters.categories, category]
-    onFilterChange({ ...filters, categories: newCats })
+    const newCats = pendingFilters.categories.includes(category)
+      ? pendingFilters.categories.filter((c) => c !== category)
+      : [...pendingFilters.categories, category]
+    setPendingFilters({ ...pendingFilters, categories: newCats })
   }
 
   const bikeCategoryLabels: Record<string, string> = {
@@ -86,11 +94,31 @@ export default function FilterSidebar({
   const categories = type === 'motorbike' ? bikeCategoryKeys : partTypes
 
   const activeFilterCount =
-    filters.brands.length +
-    filters.categories.length +
-    (filters.priceRange[0] > 0 || isFinite(filters.priceRange[1]) ? 1 : 0) +
-    (filters.year ? 1 : 0) +
-    (filters.engineSize ? 1 : 0)
+    pendingFilters.brands.length +
+    pendingFilters.categories.length +
+    (pendingFilters.priceRange[0] > 0 || isFinite(pendingFilters.priceRange[1]) ? 1 : 0) +
+    (pendingFilters.year ? 1 : 0) +
+    (pendingFilters.engineSize ? 1 : 0)
+
+  // Check if pending filters differ from committed filters (to show indicator)
+  const hasPendingChanges =
+    JSON.stringify(pendingFilters) !== JSON.stringify(filters)
+
+  const handleApply = () => {
+    onFilterChange(pendingFilters)
+    onToggle() // Close mobile overlay
+  }
+
+  const handleClear = () => {
+    setPendingFilters({
+      brands: [],
+      categories: [],
+      priceRange: [0, Infinity],
+      year: '',
+      engineSize: '',
+    })
+    onClear()
+  }
 
   const filterContent = (
     <div className="space-y-1">
@@ -116,7 +144,7 @@ export default function FilterSidebar({
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <span className="text-xs text-gray-500">{t('filter.filtersActive', { count: activeFilterCount })}</span>
           <button
-            onClick={onClear}
+            onClick={handleClear}
             className="text-[#DC2626] text-xs font-bold hover:underline uppercase tracking-wider"
           >
             {t('filter.clearAll')}
@@ -155,7 +183,7 @@ export default function FilterSidebar({
                 className="flex items-center gap-2.5 cursor-pointer group"
               >
                 <Checkbox
-                  checked={filters.brands.includes(brand)}
+                  checked={pendingFilters.brands.includes(brand)}
                   onCheckedChange={() => toggleBrand(brand)}
                   className="data-[state=checked]:bg-[#DC2626] data-[state=checked]:border-[#DC2626]"
                 />
@@ -189,7 +217,7 @@ export default function FilterSidebar({
                 className="flex items-center gap-2.5 cursor-pointer group"
               >
                 <Checkbox
-                  checked={filters.categories.includes(cat)}
+                  checked={pendingFilters.categories.includes(cat)}
                   onCheckedChange={() => toggleCategory(cat)}
                   className="data-[state=checked]:bg-[#DC2626] data-[state=checked]:border-[#DC2626]"
                 />
@@ -218,7 +246,7 @@ export default function FilterSidebar({
         {expandedSections.price && (
           <div className="mt-2 px-1 space-y-3">
             <p className="text-xs text-[#DC2626] font-semibold">
-              Range: TZS {filters.priceRange[0].toLocaleString()} — {isFinite(filters.priceRange[1]) ? `TZS ${filters.priceRange[1].toLocaleString()}` : t('filter.noLimit')}
+              Range: TZS {pendingFilters.priceRange[0].toLocaleString()} — {isFinite(pendingFilters.priceRange[1]) ? `TZS ${pendingFilters.priceRange[1].toLocaleString()}` : t('filter.noLimit')}
             </p>
             <div className="flex items-center gap-2">
               <div className="flex-1">
@@ -230,13 +258,13 @@ export default function FilterSidebar({
                   <input
                     type="number"
                     min={0}
-                    value={filters.priceRange[0] || ''}
+                    value={pendingFilters.priceRange[0] || ''}
                     onChange={(e) => {
                       const val = e.target.value === '' ? 0 : Number(e.target.value)
                       if (!isNaN(val) && val >= 0) {
-                        onFilterChange({
-                          ...filters,
-                          priceRange: [val, filters.priceRange[1]],
+                        setPendingFilters({
+                          ...pendingFilters,
+                          priceRange: [val, pendingFilters.priceRange[1]],
                         })
                       }
                     }}
@@ -255,13 +283,13 @@ export default function FilterSidebar({
                   <input
                     type="number"
                     min={0}
-                    value={isFinite(filters.priceRange[1]) ? filters.priceRange[1] || '' : ''}
+                    value={isFinite(pendingFilters.priceRange[1]) ? pendingFilters.priceRange[1] || '' : ''}
                     onChange={(e) => {
                       const val = e.target.value === '' ? Infinity : Number(e.target.value)
                       if (!isNaN(val) && (val === Infinity || val >= 0)) {
-                        onFilterChange({
-                          ...filters,
-                          priceRange: [filters.priceRange[0], val],
+                        setPendingFilters({
+                          ...pendingFilters,
+                          priceRange: [pendingFilters.priceRange[0], val],
                         })
                       }
                     }}
@@ -300,13 +328,13 @@ export default function FilterSidebar({
                     type="number"
                     min={2000}
                     max={currentYear}
-                    value={filters.year ? filters.year.split('-')[0] : ''}
+                    value={pendingFilters.year ? pendingFilters.year.split('-')[0] : ''}
                     onChange={(e) => {
                       const val = e.target.value
                       if (val === '' || (!isNaN(Number(val)) && Number(val) >= 0)) {
-                        const toYear = filters.year ? filters.year.split('-')[1] : ''
-                        onFilterChange({
-                          ...filters,
+                        const toYear = pendingFilters.year ? pendingFilters.year.split('-')[1] : ''
+                        setPendingFilters({
+                          ...pendingFilters,
                           year: val || toYear ? [val, toYear].filter(Boolean).join('-') : '',
                         })
                       }
@@ -324,13 +352,13 @@ export default function FilterSidebar({
                     type="number"
                     min={2000}
                     max={currentYear}
-                    value={filters.year ? filters.year.split('-')[1] : ''}
+                    value={pendingFilters.year ? pendingFilters.year.split('-')[1] : ''}
                     onChange={(e) => {
                       const val = e.target.value
                       if (val === '' || (!isNaN(Number(val)) && Number(val) >= 0)) {
-                        const fromYear = filters.year ? filters.year.split('-')[0] : ''
-                        onFilterChange({
-                          ...filters,
+                        const fromYear = pendingFilters.year ? pendingFilters.year.split('-')[0] : ''
+                        setPendingFilters({
+                          ...pendingFilters,
                           year: fromYear || val ? [fromYear, val].filter(Boolean).join('-') : '',
                         })
                       }
@@ -366,13 +394,13 @@ export default function FilterSidebar({
                   <button
                     key={es}
                     onClick={() =>
-                      onFilterChange({
-                        ...filters,
-                        engineSize: filters.engineSize === es ? '' : es,
+                      setPendingFilters({
+                        ...pendingFilters,
+                        engineSize: pendingFilters.engineSize === es ? '' : es,
                       })
                     }
                     className={`px-4 py-2 rounded-sm text-sm font-semibold transition-all ${
-                      filters.engineSize === es
+                      pendingFilters.engineSize === es
                         ? 'bg-[#DC2626] text-white shadow-sm'
                         : 'bg-[#F5F5F5] text-gray-600 hover:bg-gray-200'
                     }`}
@@ -389,10 +417,14 @@ export default function FilterSidebar({
       {/* Apply Filter Button */}
       <div className="pt-4 sticky bottom-0 bg-white pb-1 lg:static lg:pb-0">
         <Button
-          onClick={onToggle}
-          className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-sm"
+          onClick={handleApply}
+          className={`w-full font-bold rounded-sm transition-all ${
+            hasPendingChanges
+              ? 'bg-[#DC2626] hover:bg-[#B91C1C] text-white shadow-md animate-pulse'
+              : 'bg-[#DC2626] hover:bg-[#B91C1C] text-white'
+          }`}
         >
-          {t('filter.apply')}
+          {hasPendingChanges ? t('filter.applyChanges') || 'Apply Changes' : t('filter.apply')}
         </Button>
       </div>
     </div>

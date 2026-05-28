@@ -64,3 +64,29 @@ Stage Summary:
 - Bell icon hidden on small screens, username hidden on mobile
 - Progress bars in inventory overview use w-16 on mobile, w-32 on larger
 
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: Modify product filters to only update on "Apply Filter" click (not live), and prevent page scroll/jump after filtering
+
+Work Log:
+- Read FilterSidebar.tsx, SparePartsInventory.tsx, MotorbikeInventory.tsx to understand current live-filtering behavior
+- FilterSidebar.tsx: Added `pendingFilters` local state that UI interacts with; all filter changes (brands, categories, price, year, engineSize) now update `pendingFilters` instead of calling `onFilterChange` immediately
+- FilterSidebar.tsx: "Apply Filter" button now calls `onFilterChange(pendingFilters)` to commit changes + closes mobile overlay
+- FilterSidebar.tsx: Added `useEffect` to sync `pendingFilters` when parent `filters` prop changes (e.g., on Clear All)
+- FilterSidebar.tsx: Added `hasPendingChanges` indicator — button shows "APPLY CHANGES" with pulse animation when there are uncommitted changes
+- SparePartsInventory.tsx: Same pending filter pattern — `pendingFilters` for UI, `filters` for committed filtering
+- SparePartsInventory.tsx: `filteredParts` useMemo uses committed `filters` only, not `pendingFilters`
+- SparePartsInventory.tsx: Price inputs update `pendingFilters` without affecting product list until Apply is clicked
+- Both sections: Added `style={{ overflowAnchor: 'none' }}` to prevent browser scroll anchoring from jumping when product list shrinks
+- Added i18n keys: `filter.applyChanges` ("APPLY CHANGES" / "TEKELEZA MABADILIKO") in en.json and sw.json
+- Build verified successfully with `npx next build`
+
+Stage Summary:
+- All filters (price, brand, category, year, engineSize, in-stock) now only apply when user clicks "Apply Filter"
+- Price inputs no longer cause live product list updates
+- "Apply Filter" button pulses and shows "APPLY CHANGES" when there are uncommitted filter changes
+- Page no longer scrolls/jumps when filters are applied (overflowAnchor: none)
+- "Clear All" resets both pending and committed filters immediately
+- Desktop sidebar "Apply Filter" button also works correctly (closes nothing, commits filters)

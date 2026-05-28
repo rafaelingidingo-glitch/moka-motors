@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { motion } from 'framer-motion'
 import { SlidersHorizontal, ArrowUpDown, Wrench } from 'lucide-react'
@@ -51,7 +51,10 @@ const defaultFilters: PartFilterState = {
 
 export default function SparePartsInventory() {
   const [parts, setParts] = useState<SparePart[]>([])
+  // Committed filters - these actually filter the product list
   const [filters, setFilters] = useState<PartFilterState>(defaultFilters)
+  // Pending filters - UI changes update these, committed on "Apply Filter"
+  const [pendingFilters, setPendingFilters] = useState<PartFilterState>(defaultFilters)
   const [sort, setSort] = useState('newest')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [showCount, setShowCount] = useState(6)
@@ -116,31 +119,50 @@ export default function SparePartsInventory() {
     return result
   }, [parts, filters, sort])
 
+  // Sync pending filters when committed filters change (e.g., on Clear All)
+  useEffect(() => {
+    setPendingFilters(filters)
+  }, [filters])
+
   const toggleType = (type: string) => {
-    const newTypes = filters.types.includes(type)
-      ? filters.types.filter((t) => t !== type)
-      : [...filters.types, type]
-    setFilters({ ...filters, types: newTypes })
-    setShowCount(6)
+    const newTypes = pendingFilters.types.includes(type)
+      ? pendingFilters.types.filter((t) => t !== type)
+      : [...pendingFilters.types, type]
+    setPendingFilters({ ...pendingFilters, types: newTypes })
   }
 
   const toggleBrand = (brand: string) => {
-    const newBrands = filters.brands.includes(brand)
-      ? filters.brands.filter((b) => b !== brand)
-      : [...filters.brands, brand]
-    setFilters({ ...filters, brands: newBrands })
-    setShowCount(6)
+    const newBrands = pendingFilters.brands.includes(brand)
+      ? pendingFilters.brands.filter((b) => b !== brand)
+      : [...pendingFilters.brands, brand]
+    setPendingFilters({ ...pendingFilters, brands: newBrands })
   }
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }))
   }
 
+  // Check if pending filters differ from committed filters
+  const hasPendingChanges =
+    JSON.stringify(pendingFilters) !== JSON.stringify(filters)
+
+  const handleApply = useCallback(() => {
+    setFilters(pendingFilters)
+    setShowCount(6)
+    setIsFilterOpen(false)
+  }, [pendingFilters])
+
+  const handleClear = useCallback(() => {
+    setPendingFilters(defaultFilters)
+    setFilters(defaultFilters)
+    setShowCount(6)
+  }, [])
+
   const activeFilterCount =
-    filters.types.length +
-    filters.brands.length +
-    (filters.priceRange[0] > 0 || isFinite(filters.priceRange[1]) ? 1 : 0) +
-    (filters.inStockOnly ? 1 : 0)
+    pendingFilters.types.length +
+    pendingFilters.brands.length +
+    (pendingFilters.priceRange[0] > 0 || isFinite(pendingFilters.priceRange[1]) ? 1 : 0) +
+    (pendingFilters.inStockOnly ? 1 : 0)
 
   const filterContent = (
     <div className="space-y-1">
@@ -160,10 +182,7 @@ export default function SparePartsInventory() {
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <span className="text-xs text-gray-500">{t('filter.filtersActive', { count: activeFilterCount })}</span>
           <button
-            onClick={() => {
-              setFilters(defaultFilters)
-              setShowCount(6)
-            }}
+            onClick={handleClear}
             className="text-[#DC2626] text-xs font-bold hover:underline uppercase tracking-wider"
           >
             {t('filter.clearAll')}
@@ -199,7 +218,7 @@ export default function SparePartsInventory() {
             {partTypes.map((type) => (
               <label key={type} className="flex items-center gap-2.5 cursor-pointer group">
                 <Checkbox
-                  checked={filters.types.includes(type)}
+                  checked={pendingFilters.types.includes(type)}
                   onCheckedChange={() => toggleType(type)}
                   className="data-[state=checked]:bg-[#DC2626] data-[state=checked]:border-[#DC2626]"
                 />
@@ -233,7 +252,7 @@ export default function SparePartsInventory() {
                 className="flex items-center gap-2.5 cursor-pointer group"
               >
                 <Checkbox
-                  checked={filters.brands.includes(brand)}
+                  checked={pendingFilters.brands.includes(brand)}
                   onCheckedChange={() => toggleBrand(brand)}
                   className="data-[state=checked]:bg-[#DC2626] data-[state=checked]:border-[#DC2626]"
                 />
@@ -262,7 +281,7 @@ export default function SparePartsInventory() {
         {expandedSections.price && (
           <div className="mt-2 px-1 space-y-3">
             <p className="text-xs text-[#DC2626] font-semibold">
-              Range: TZS {filters.priceRange[0].toLocaleString()} — {isFinite(filters.priceRange[1]) ? `TZS ${filters.priceRange[1].toLocaleString()}` : t('filter.noLimit')}
+              Range: TZS {pendingFilters.priceRange[0].toLocaleString()} — {isFinite(pendingFilters.priceRange[1]) ? `TZS ${pendingFilters.priceRange[1].toLocaleString()}` : t('filter.noLimit')}
             </p>
             <div className="flex items-center gap-2">
               <div className="flex-1">
@@ -274,16 +293,15 @@ export default function SparePartsInventory() {
                   <input
                     type="number"
                     min={0}
-                    value={filters.priceRange[0] || ''}
+                    value={pendingFilters.priceRange[0] || ''}
                     onChange={(e) => {
                       const val = e.target.value === '' ? 0 : Number(e.target.value)
                       if (!isNaN(val) && val >= 0) {
-                        setFilters({ ...filters, priceRange: [val, filters.priceRange[1]] })
-                        setShowCount(6)
+                        setPendingFilters({ ...pendingFilters, priceRange: [val, pendingFilters.priceRange[1]] })
                       }
                     }}
                     placeholder="0"
-                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance:none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
               </div>
@@ -297,16 +315,15 @@ export default function SparePartsInventory() {
                   <input
                     type="number"
                     min={0}
-                    value={isFinite(filters.priceRange[1]) ? filters.priceRange[1] || '' : ''}
+                    value={isFinite(pendingFilters.priceRange[1]) ? pendingFilters.priceRange[1] || '' : ''}
                     onChange={(e) => {
                       const val = e.target.value === '' ? Infinity : Number(e.target.value)
                       if (!isNaN(val) && (val === Infinity || val >= 0)) {
-                        setFilters({ ...filters, priceRange: [filters.priceRange[0], val] })
-                        setShowCount(6)
+                        setPendingFilters({ ...pendingFilters, priceRange: [pendingFilters.priceRange[0], val] })
                       }
                     }}
                     placeholder={t('filter.noLimit')}
-                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance:none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
               </div>
@@ -332,9 +349,9 @@ export default function SparePartsInventory() {
           <div className="flex items-center justify-between mt-2">
             <span className="text-sm text-gray-600">{t('filter.inStockOnly')}</span>
             <Switch
-              checked={filters.inStockOnly}
+              checked={pendingFilters.inStockOnly}
               onCheckedChange={(checked) =>
-                setFilters({ ...filters, inStockOnly: checked })
+                setPendingFilters({ ...pendingFilters, inStockOnly: checked })
               }
             />
           </div>
@@ -344,17 +361,21 @@ export default function SparePartsInventory() {
       {/* Apply Filter Button */}
       <div className="pt-4 sticky bottom-0 bg-white pb-1 lg:static lg:pb-0">
         <Button
-          onClick={() => setIsFilterOpen(false)}
-          className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-sm"
+          onClick={handleApply}
+          className={`w-full font-bold rounded-sm transition-all ${
+            hasPendingChanges
+              ? 'bg-[#DC2626] hover:bg-[#B91C1C] text-white shadow-md animate-pulse'
+              : 'bg-[#DC2626] hover:bg-[#B91C1C] text-white'
+          }`}
         >
-          {t('filter.apply')}
+          {hasPendingChanges ? t('filter.applyChanges') : t('filter.apply')}
         </Button>
       </div>
     </div>
   )
 
   return (
-    <section id="spare-parts" className="py-12 md:py-20 lg:py-28 bg-white">
+    <section id="spare-parts" className="py-12 md:py-20 lg:py-28 bg-white" style={{ overflowAnchor: 'none' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -450,10 +471,7 @@ export default function SparePartsInventory() {
                   {t('spareParts.noMatch')}
                 </p>
                 <button
-                  onClick={() => {
-                    setFilters(defaultFilters)
-                    setShowCount(6)
-                  }}
+                  onClick={handleClear}
                   className="text-[#DC2626] font-medium mt-2 hover:underline"
                 >
                   {t('spareParts.clearFilters')}

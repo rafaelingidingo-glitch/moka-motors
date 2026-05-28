@@ -113,6 +113,7 @@
     "yearPlaceholder": "e.g. 2020",
     "engineSize": "Engine Size",
     "apply": "APPLY FILTER",
+    "applyChanges": "APPLY CHANGES",
     "filters": "Filters",
     "availability": "Availability",
     "inStockOnly": "In Stock Only",
