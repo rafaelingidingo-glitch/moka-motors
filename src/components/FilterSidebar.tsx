@@ -36,6 +36,8 @@ const partTypes = [
   'Accessories',
 ]
 
+const currentYear = new Date().getFullYear()
+
 export default function FilterSidebar({
   type,
   filters,
@@ -231,7 +233,7 @@ export default function FilterSidebar({
                       }
                     }}
                     placeholder="0"
-                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance:none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
               </div>
@@ -258,7 +260,7 @@ export default function FilterSidebar({
                       }
                     }}
                     placeholder={type === 'motorbike' ? '25,000,000' : '600,000'}
-                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance:none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
               </div>
@@ -291,7 +293,7 @@ export default function FilterSidebar({
                   <input
                     type="number"
                     min={2000}
-                    max={2026}
+                    max={currentYear}
                     value={filters.year ? filters.year.split('-')[0] : ''}
                     onChange={(e) => {
                       const val = e.target.value
@@ -304,7 +306,7 @@ export default function FilterSidebar({
                       }
                     }}
                     placeholder="e.g. 2020"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance:none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
                 <span className="text-gray-300 mt-5">—</span>
@@ -315,7 +317,7 @@ export default function FilterSidebar({
                   <input
                     type="number"
                     min={2000}
-                    max={2026}
+                    max={currentYear}
                     value={filters.year ? filters.year.split('-')[1] : ''}
                     onChange={(e) => {
                       const val = e.target.value
@@ -327,8 +329,8 @@ export default function FilterSidebar({
                         })
                       }
                     }}
-                    placeholder="e.g. 2024"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    placeholder={`e.g. ${currentYear}`}
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance:none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
               </div>
