@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { MapPin, Phone, Mail, Instagram, MessageCircle, Send } from 'lucide-react'
+import { MapPin, Phone, Mail, Instagram, MessageCircle } from 'lucide-react'
 import { getContactFormMessage, getWhatsAppUrl } from '@/lib/whatsapp'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'

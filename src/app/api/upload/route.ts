@@ -4,6 +4,9 @@ import path from 'path'
 import { existsSync } from 'fs'
 import { requireAdmin } from '@/lib/auth'
 
+// Allowed file extensions (lowercase, no dots)
+const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']
+
 export async function POST(request: NextRequest) {
   // Auth check — only admins can upload files
   const authError = await requireAdmin(request)
@@ -35,12 +38,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate unique filename
+    // Generate unique filename with sanitized extension
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    const ext = path.extname(file.name) || `.${file.type.split('/')[1]}`
-    const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`
+    // Sanitize extension: extract and validate against allowed list
+    const rawExt = path.extname(file.name).toLowerCase().replace(/^\./, '')
+    const ext = ALLOWED_EXTENSIONS.includes(rawExt) ? rawExt : file.type.split('/')[1] || 'jpg'
+    const safeExt = ALLOWED_EXTENSIONS.includes(ext) ? ext : 'jpg'
+
+    const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${safeExt}`
 
     // Ensure uploads directory exists
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads')

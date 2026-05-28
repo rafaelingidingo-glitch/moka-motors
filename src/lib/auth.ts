@@ -19,12 +19,6 @@ export async function requireAdmin(request: NextRequest): Promise<NextResponse |
     }
   }
 
-  // Check for admin token header (for API clients)
-  const adminToken = request.headers.get('x-admin-auth')
-  if (adminToken === 'mokamotors-admin-2024') {
-    return null
-  }
-
   // Not authenticated
   return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 })
 }
@@ -54,11 +48,6 @@ export async function requireSuperAdmin(request: NextRequest): Promise<NextRespo
   const admin = await getCurrentAdmin(request)
 
   if (!admin) {
-    // Check for admin token header fallback
-    const adminToken = request.headers.get('x-admin-auth')
-    if (adminToken === 'mokamotors-admin-2024') {
-      return null
-    }
     return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 })
   }
 

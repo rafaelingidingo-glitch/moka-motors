@@ -90,3 +90,58 @@ Stage Summary:
 - Page no longer scrolls/jumps when filters are applied (overflowAnchor: none)
 - "Clear All" resets both pending and committed filters immediately
 - Desktop sidebar "Apply Filter" button also works correctly (closes nothing, commits filters)
+
+---
+Task ID: 4
+Agent: Main Agent
+Task: Thorough code review — identify and fix all bugs, errors, version incompatibilities, and dependency issues
+
+Work Log:
+- Reviewed all source files: components, API routes, stores, utility modules, i18n, auth
+- Reviewed package.json dependencies for version compatibility issues
+- Ran TypeScript type checker (tsc --noEmit) — no errors
+- Ran ESLint — no errors
+- Ran npm audit — found 14 vulnerabilities
+
+FIXES APPLIED:
+
+1. **Security: Removed hardcoded auth token bypass** (auth.ts)
+   - Removed `x-admin-auth: mokamotors-admin-2024` header check from `requireAdmin()` and `requireSuperAdmin()`
+   - This was a backdoor allowing anyone with the token to bypass auth and get super_admin access
+
+2. **Security: Sanitized file upload extension** (upload/route.ts)
+   - Added explicit ALLOWED_EXTENSIONS allowlist for file extensions
+   - Sanitized raw extension from filename against allowlist
+   - Prevents path traversal via crafted filenames with malicious extensions
+
+3. **Bug: Prisma query logging in production** (db.ts)
+   - Changed from always `log: ['query']` to conditional: `['query']` in development, `['error']` in production
+   - Query logging is a significant performance hit in production
+
+4. **Bug: @dnd-kit/sortable version incompatibility** (package.json)
+   - Downgraded from ^10.0.0 to ^8.0.0 (sortable v10 requires @dnd-kit/core v8, but we have v6)
+   - Note: @dnd-kit is not used in the app code, only listed as dependency
+
+5. **Bug: Removed unused dependencies** (package.json)
+   - Removed `next-auth` (v4.24.14) — never imported anywhere in the codebase
+   - Removed `next-intl` (v4.13.0) — never imported anywhere (custom i18n is used instead)
+
+6. **Bug: Missing error handling in AdminPage fetch calls**
+   - Added `res.ok` checks for all admin CRUD operations: save motorbike, save spare part, delete motorbike, delete spare part, toggle featured, toggle new stock, toggle in stock
+   - Previously showed success toast even when the API returned errors
+
+7. **Minor: Removed unused import** (ContactSection.tsx)
+   - Removed unused `Send` icon import from lucide-react
+
+ISSUES NOTED BUT NOT CHANGED (requirement discussions needed):
+
+- **Plaintext passwords**: Admin passwords are stored and compared as plaintext. Should use bcrypt/argon2 hashing, but this requires a migration strategy for existing passwords.
+- **Float for money**: `price` field uses Prisma `Float` which can cause rounding errors. Should use `Decimal` or store as integer cents, but this is a schema migration.
+- **Remaining npm audit vulnerabilities**: 2 moderate severity in transitive dependencies (brace-expansion, defu) — these are in dev tooling, not runtime code.
+
+Stage Summary:
+- Build succeeds with all fixes applied
+- 3 security vulnerabilities fixed (auth bypass, file upload, prod logging)
+- 2 version/dependency bugs fixed (dnd-kit, unused deps)
+- 7 fetch error handling bugs fixed
+- Dependencies cleaned up (removed next-auth, next-intl)

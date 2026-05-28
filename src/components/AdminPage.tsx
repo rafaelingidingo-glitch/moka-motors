@@ -392,23 +392,28 @@ export default function AdminPage() {
     }
 
     try {
+      let res: Response
       if (editingItem) {
-        await fetch(`/api/motorbikes/${editingItem.id}`, {
+        res = await fetch(`/api/motorbikes/${editingItem.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify(payload),
         })
-        toast.success(t('admin.motorbikeUpdated'))
       } else {
-        await fetch('/api/motorbikes', {
+        res = await fetch('/api/motorbikes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify(payload),
         })
-        toast.success(t('admin.motorbikeAdded'))
       }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        toast.error(data.error || t('admin.failedSave'))
+        return
+      }
+      toast.success(editingItem ? t('admin.motorbikeUpdated') : t('admin.motorbikeAdded'))
       fetchMotorbikes()
       resetForm()
     } catch {
@@ -430,23 +435,28 @@ export default function AdminPage() {
     }
 
     try {
+      let res: Response
       if (editingItem) {
-        await fetch(`/api/spare-parts/${editingItem.id}`, {
+        res = await fetch(`/api/spare-parts/${editingItem.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify(payload),
         })
-        toast.success(t('admin.sparePartUpdated'))
       } else {
-        await fetch('/api/spare-parts', {
+        res = await fetch('/api/spare-parts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify(payload),
         })
-        toast.success(t('admin.sparePartAdded'))
       }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        toast.error(data.error || t('admin.failedSave'))
+        return
+      }
+      toast.success(editingItem ? t('admin.sparePartUpdated') : t('admin.sparePartAdded'))
       fetchSpareParts()
       resetForm()
     } catch {
@@ -457,7 +467,11 @@ export default function AdminPage() {
   const handleDeleteMotorbike = async (id: string) => {
     if (!confirm(t('admin.deleteConfirm'))) return
     try {
-      await fetch(`/api/motorbikes/${id}`, { method: 'DELETE', credentials: 'include' })
+      const res = await fetch(`/api/motorbikes/${id}`, { method: 'DELETE', credentials: 'include' })
+      if (!res.ok) {
+        toast.error(t('admin.failedDelete'))
+        return
+      }
       toast.success(t('admin.motorbikeDeleted'))
       fetchMotorbikes()
     } catch {
@@ -468,7 +482,11 @@ export default function AdminPage() {
   const handleDeleteSparePart = async (id: string) => {
     if (!confirm(t('admin.deleteSpareConfirm'))) return
     try {
-      await fetch(`/api/spare-parts/${id}`, { method: 'DELETE', credentials: 'include' })
+      const res = await fetch(`/api/spare-parts/${id}`, { method: 'DELETE', credentials: 'include' })
+      if (!res.ok) {
+        toast.error(t('admin.failedDelete'))
+        return
+      }
       toast.success(t('admin.sparePartDeleted'))
       fetchSpareParts()
     } catch {
@@ -482,23 +500,19 @@ export default function AdminPage() {
     current: boolean
   ) => {
     try {
-      if (type === 'motorbike') {
-        await fetch(`/api/motorbikes/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ featured: !current }),
-        })
-        fetchMotorbikes()
-      } else {
-        await fetch(`/api/spare-parts/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ featured: !current }),
-        })
-        fetchSpareParts()
+      const url = type === 'motorbike' ? `/api/motorbikes/${id}` : `/api/spare-parts/${id}`
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ featured: !current }),
+      })
+      if (!res.ok) {
+        toast.error(t('admin.failedUpdate'))
+        return
       }
+      if (type === 'motorbike') fetchMotorbikes()
+      else fetchSpareParts()
       toast.success(t('admin.statusUpdated'))
     } catch {
       toast.error(t('admin.failedUpdate'))
@@ -507,12 +521,16 @@ export default function AdminPage() {
 
   const handleToggleNewStock = async (id: string, current: boolean) => {
     try {
-      await fetch(`/api/motorbikes/${id}`, {
+      const res = await fetch(`/api/motorbikes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ isNewStock: !current }),
       })
+      if (!res.ok) {
+        toast.error(t('admin.failedUpdate'))
+        return
+      }
       fetchMotorbikes()
       toast.success(t('admin.statusUpdated'))
     } catch {
@@ -522,12 +540,16 @@ export default function AdminPage() {
 
   const handleToggleInStock = async (id: string, current: boolean) => {
     try {
-      await fetch(`/api/spare-parts/${id}`, {
+      const res = await fetch(`/api/spare-parts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ inStock: !current }),
       })
+      if (!res.ok) {
+        toast.error(t('admin.failedUpdate'))
+        return
+      }
       fetchSpareParts()
       toast.success(t('admin.stockStatusUpdated'))
     } catch {
