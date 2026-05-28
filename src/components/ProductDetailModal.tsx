@@ -115,7 +115,7 @@ export default function ProductDetailModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-0 gap-0 rounded-lg sm:rounded-lg rounded-none"
+        className="sm:max-w-4xl max-h-[100vh] sm:max-h-[90vh] overflow-y-auto p-0 gap-0 rounded-none sm:rounded-lg"
         showCloseButton={true}
       >
         <DialogTitle className="sr-only">{product.name} - Product Details</DialogTitle>
@@ -125,7 +125,7 @@ export default function ProductDetailModal({
             <img
               src={images[currentImage] || '/images/placeholder.png'}
               alt={product.name}
-              className="w-full h-56 sm:h-72 md:h-80 lg:h-full min-h-[220px] sm:min-h-[320px] object-cover"
+              className="w-full h-56 sm:h-72 md:h-80 lg:h-full min-h-[200px] sm:min-h-[280px] object-cover"
             />
             {/* Navigation Arrows */}
             {hasMultipleImages && (
@@ -197,7 +197,7 @@ export default function ProductDetailModal({
           </div>
 
           {/* Details Section */}
-          <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 flex flex-col">
+          <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 flex flex-col pb-20 sm:pb-6 lg:pb-8">
             {/* Category / Type Tag */}
             <p className="text-[#DC2626] text-xs font-bold uppercase tracking-[0.15em] mb-2">
               {isMotorbike(product) ? `Category: ${product.category}` : `Type: ${product.type}`}
@@ -306,34 +306,33 @@ export default function ProductDetailModal({
             )}
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-6 pt-5 border-t border-gray-100">
-              <div className="flex gap-2">
-                <button
-                  onClick={handleAddToCart}
-                  disabled={!isMotorbike(product) && !product.inStock}
-                  className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-bold py-3 rounded-sm transition-colors flex items-center justify-center gap-2"
+            <div className="flex gap-3 mt-6 pt-5 border-t border-gray-100">
+              <button
+                onClick={handleAddToCart}
+                disabled={!isMotorbike(product) && !product.inStock}
+                className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-bold py-3 rounded-sm transition-colors flex items-center justify-center gap-2"
+              >
+                <ShoppingCart className="h-4 w-4" />
+                <span className="hidden sm:inline">Add to Cart</span>
+                <span className="sm:hidden">Cart</span>
+              </button>
+              <button
+                onClick={() => toggleLike(product.id)}
+                className={`px-4 py-3 rounded-sm border-2 transition-all shrink-0 ${
+                  liked
+                    ? 'bg-[#DC2626]/10 border-[#DC2626]/30 text-[#DC2626]'
+                    : 'bg-white border-gray-200 text-gray-400 hover:border-[#DC2626]/30 hover:text-[#DC2626]'
+                }`}
+              >
+                <svg
+                  className={`h-5 w-5 ${liked ? 'fill-[#DC2626]' : ''}`}
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
                 >
-                  <ShoppingCart className="h-4 w-4" />
-                  Add to Cart
-                </button>
-                <button
-                  onClick={() => toggleLike(product.id)}
-                  className={`px-4 py-3 rounded-sm border-2 transition-all ${
-                    liked
-                      ? 'bg-[#DC2626]/10 border-[#DC2626]/30 text-[#DC2626]'
-                      : 'bg-white border-gray-200 text-gray-400 hover:border-[#DC2626]/30 hover:text-[#DC2626]'
-                  }`}
-                >
-                  <svg
-                    className={`h-5 w-5 ${liked ? 'fill-[#DC2626]' : ''}`}
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
-                </button>
-              </div>
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+              </button>
               <a
                 href={getWhatsAppUrl(
                   getProductInquiryMessage(
@@ -345,7 +344,7 @@ export default function ProductDetailModal({
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-5 py-3 rounded-sm transition-colors flex items-center justify-center gap-2 sm:flex-none"
+                className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-5 py-3 rounded-sm transition-colors flex items-center justify-center gap-2 shrink-0"
               >
                 Buy Now
               </a>

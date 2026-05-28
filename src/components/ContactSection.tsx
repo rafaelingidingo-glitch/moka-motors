@@ -24,7 +24,7 @@ export default function ContactSection() {
   }
 
   return (
-    <section id="contact" className="py-20 md:py-28 bg-[#111111] relative overflow-hidden">
+    <section id="contact" className="py-12 md:py-20 lg:py-28 bg-[#111111] relative overflow-hidden">
       {/* Background decorative */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-[#1A1A1A] skew-x-[-6deg] translate-x-1/4 hidden lg:block" />
 
@@ -43,7 +43,7 @@ export default function ContactSection() {
             </p>
             <div className="w-8 h-[2px] bg-[#DC2626]" />
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-white">
             Contact <span className="text-[#DC2626]">Us</span>
           </h2>
           <p className="text-gray-400 mt-4 max-w-2xl mx-auto">

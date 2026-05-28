@@ -378,7 +378,7 @@ export default function FilterSidebar({
       )}
 
       {/* Apply Filter Button */}
-      <div className="pt-4">
+      <div className="pt-4 sticky bottom-0 bg-white pb-1 lg:static lg:pb-0">
         <Button
           onClick={onToggle}
           className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-sm"
@@ -412,8 +412,10 @@ export default function FilterSidebar({
       {isOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={onToggle} />
-          <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-80 bg-white shadow-2xl overflow-y-auto p-5">
-            {filterContent}
+          <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-80 bg-white shadow-2xl flex flex-col">
+            <div className="overflow-y-auto flex-1 p-5">
+              {filterContent}
+            </div>
           </div>
         </div>
       )}

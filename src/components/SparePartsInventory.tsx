@@ -328,7 +328,7 @@ export default function SparePartsInventory() {
       </div>
 
       {/* Apply Filter Button */}
-      <div className="pt-4">
+      <div className="pt-4 sticky bottom-0 bg-white pb-1 lg:static lg:pb-0">
         <Button
           onClick={() => setIsFilterOpen(false)}
           className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-sm"
@@ -340,7 +340,7 @@ export default function SparePartsInventory() {
   )
 
   return (
-    <section id="spare-parts" className="py-20 md:py-28 bg-white">
+    <section id="spare-parts" className="py-12 md:py-20 lg:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -356,7 +356,7 @@ export default function SparePartsInventory() {
             </p>
             <div className="w-8 h-[2px] bg-[#DC2626]" />
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#111111]">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-[#111111]">
             Spare Parts <span className="text-[#DC2626]">Inventory</span>
           </h2>
           <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto">
@@ -390,8 +390,10 @@ export default function SparePartsInventory() {
                 className="absolute inset-0 bg-black/50"
                 onClick={() => setIsFilterOpen(false)}
               />
-              <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-80 bg-white shadow-2xl overflow-y-auto p-5">
-                {filterContent}
+              <div className="absolute left-0 top-0 bottom-0 w-[85vw] max-w-80 bg-white shadow-2xl flex flex-col">
+                <div className="overflow-y-auto flex-1 p-5">
+                  {filterContent}
+                </div>
               </div>
             </div>
           )}
@@ -417,7 +419,7 @@ export default function SparePartsInventory() {
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="text-sm border border-gray-200 rounded-sm px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#DC2626]"
+                  className="text-sm border border-gray-200 rounded-sm px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#DC2626] max-w-[180px]"
                 >
                   <option value="newest">Featured First</option>
                   <option value="price-asc">Price: Low to High</option>

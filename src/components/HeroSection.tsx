@@ -88,7 +88,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="flex items-center gap-8 mt-12 pt-8 border-t border-white/10"
+            className="flex items-center gap-4 sm:gap-8 mt-12 pt-8 border-t border-white/10"
           >
             <div>
               <p className="text-3xl font-black text-white">10+</p>

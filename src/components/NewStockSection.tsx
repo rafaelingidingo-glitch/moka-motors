@@ -51,7 +51,7 @@ export default function NewStockSection() {
   }
 
   return (
-    <section id="new-stock" className="py-20 md:py-28 bg-[#111111] relative overflow-hidden">
+    <section id="new-stock" className="py-12 md:py-20 lg:py-28 bg-[#111111] relative overflow-hidden">
       {/* Background texture */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
@@ -76,7 +76,7 @@ export default function NewStockSection() {
             </p>
             <div className="w-8 h-[2px] bg-[#DC2626]" />
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-4">
             New Stock <span className="text-[#DC2626]">Available</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">

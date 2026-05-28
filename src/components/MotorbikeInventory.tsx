@@ -120,7 +120,7 @@ export default function MotorbikeInventory() {
   }, [bikes, filters, sort])
 
   return (
-    <section id="motorbikes" className="py-20 md:py-28 bg-[#F5F5F5]">
+    <section id="motorbikes" className="py-12 md:py-20 lg:py-28 bg-[#F5F5F5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -136,7 +136,7 @@ export default function MotorbikeInventory() {
             </p>
             <div className="w-8 h-[2px] bg-[#DC2626]" />
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#111111]">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-[#111111]">
             Choose a <span className="text-[#DC2626]">Motorcycle</span>
           </h2>
           <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto">
@@ -172,14 +172,14 @@ export default function MotorbikeInventory() {
                 <span className="font-black text-[#111111]">{filteredBikes.length}</span>{' '}
                 results
               </p>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between sm:justify-end gap-3">
                 {/* Sort */}
                 <div className="flex items-center gap-1.5">
                   <ArrowUpDown className="h-4 w-4 text-gray-400" />
                   <select
                     value={sort}
                     onChange={(e) => setSort(e.target.value)}
-                    className="text-sm border border-gray-200 rounded-sm px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#DC2626]"
+                    className="text-sm border border-gray-200 rounded-sm px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#DC2626] max-w-[180px]"
                   >
                     <option value="newest">Newest First</option>
                     <option value="price-asc">Price: Low to High</option>

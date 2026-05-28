@@ -78,7 +78,7 @@ export default function SparePartCard({ part }: { part: SparePart }) {
           <img
             src={images[currentImage] || '/images/placeholder.png'}
             alt={part.name}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-700"
           />
           {/* Navigation Arrows */}
           {hasMultipleImages && (
@@ -183,34 +183,32 @@ export default function SparePartCard({ part }: { part: SparePart }) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2 mt-4">
-            <div className="flex gap-2">
-              <button
-                onClick={handleAddToCart}
-                disabled={!part.inStock}
-                className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-bold py-2.5 rounded-sm transition-colors flex items-center justify-center gap-1.5"
+          <div className="flex gap-2 mt-4">
+            <button
+              onClick={handleAddToCart}
+              disabled={!part.inStock}
+              className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-bold py-2.5 rounded-sm transition-colors flex items-center justify-center gap-1.5"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span className="sm:inline">Add to Cart</span>
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); toggleLike(part.id) }}
+              className={`px-3 py-2.5 rounded-sm border transition-colors shrink-0 ${
+                liked
+                  ? 'bg-[#DC2626]/10 border-[#DC2626]/30 text-[#DC2626]'
+                  : 'bg-white border-gray-200 text-gray-400 hover:border-[#DC2626]/30 hover:text-[#DC2626]'
+              }`}
+            >
+              <svg
+                className={`h-4 w-4 ${liked ? 'fill-[#DC2626]' : ''}`}
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
               >
-                <ShoppingCart className="h-4 w-4" />
-                Add to Cart
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); toggleLike(part.id) }}
-                className={`px-3 py-2.5 rounded-sm border transition-colors ${
-                  liked
-                    ? 'bg-[#DC2626]/10 border-[#DC2626]/30 text-[#DC2626]'
-                    : 'bg-white border-gray-200 text-gray-400 hover:border-[#DC2626]/30 hover:text-[#DC2626]'
-                }`}
-              >
-                <svg
-                  className={`h-4 w-4 ${liked ? 'fill-[#DC2626]' : ''}`}
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
-              </button>
-            </div>
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </button>
             <a
               href={getWhatsAppUrl(
                 getProductInquiryMessage(part.name, part.price, part.brand, 'spare-part')
@@ -218,7 +216,7 @@ export default function SparePartCard({ part }: { part: SparePart }) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2.5 rounded-sm transition-colors flex items-center justify-center gap-1.5 sm:flex-none"
+              className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2.5 rounded-sm transition-colors flex items-center justify-center gap-1.5 shrink-0"
             >
                 Buy Now
             </a>
