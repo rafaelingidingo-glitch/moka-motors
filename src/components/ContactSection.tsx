@@ -132,7 +132,7 @@ export default function ContactSection() {
                   type="submit"
                   className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold py-4 rounded-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#DC2626]/20 hover:shadow-[#DC2626]/30"
                 >
-                  {t('contact.sendWhatsApp')}
+                  {t('contact.submit')}
                 </button>
               </form>
             </div>

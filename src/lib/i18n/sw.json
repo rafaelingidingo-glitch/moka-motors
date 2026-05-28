@@ -12,11 +12,11 @@
     "adminLogin": "Ingia kama Msimamizi"
   },
   "hero": {
-    "premium": "BORA",
-    "motorbikes": "PIKIPIKI",
+    "premium": "PIKIPIKI",
+    "motorbikes": "BORA",
     "spareParts": "& VIPURI",
     "location": "DAR ES SALAAM, TANZANIA",
-    "description": "Mahali unapoaminika kwa pikipiki bora na vipuri halisi. Upo Kariakoo, Dar es Salaam — tunakuleta fariki bora kwa bei zisizo shindani.",
+    "description": "Mahali panapoaminika kwa pikipiki bora na vipuri halisi. Tupo Kariakoo, Dar es Salaam — tunakuleta fariki bora kwa bei zisizo shindani.",
     "exploreInventory": "TAZAMA HIFADHI",
     "contactUs": "WASILIANA NASI",
     "statsMotorbikes": "Pikipiki",
@@ -162,6 +162,7 @@
     "message": "Ujumbe",
     "messagePlaceholder": "Tuambie unatafuta nini...",
     "sendWhatsApp": "Tuma kupitia WhatsApp",
+    "submit": "Tuma",
     "visitShop": "Tembelea Duka Letu",
     "address": "Anwani",
     "phone": "Simu",

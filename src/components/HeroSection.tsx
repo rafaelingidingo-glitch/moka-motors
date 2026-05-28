@@ -48,9 +48,7 @@ export default function HeroSection() {
             <span className="block text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white/90 mt-2">
               {t('hero.spareParts')}
             </span>
-            <span className="block text-lg md:text-xl lg:text-2xl text-gray-400 font-normal mt-4 tracking-wide">
-              {t('hero.location')}
-            </span>
+        
           </motion.h1>
 
           <motion.p
