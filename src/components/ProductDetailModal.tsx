@@ -24,6 +24,7 @@ import {
   Paintbrush,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n'
 
 interface MotorbikeData {
   id: string
@@ -73,6 +74,7 @@ export default function ProductDetailModal({
 }: ProductDetailModalProps) {
   const { addItem } = useCartStore()
   const { toggleLike, isLiked } = useLikeStore()
+  const { t } = useTranslation()
   const [currentImage, setCurrentImage] = useState(0)
 
   if (!product) return null
@@ -92,7 +94,7 @@ export default function ProductDetailModal({
       brand: product.brand,
       type: isMotorbike(product) ? 'motorbike' : 'spare-part',
     })
-    toast.success(`${product.name} added to cart!`)
+    toast.success(t('product.addedToCart', { name: product.name }))
   }
 
   const goToPrev = () => {
@@ -160,12 +162,12 @@ export default function ProductDetailModal({
             <div className="absolute top-3 left-3 flex gap-2 z-10">
               {product.featured && (
                 <span className="bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-sm flex items-center gap-1 uppercase tracking-wider">
-                  <Star className="h-3.5 w-3.5" /> Featured
+                  <Star className="h-3.5 w-3.5" /> {t('product.featured')}
                 </span>
               )}
               {isMotorbike(product) && product.isNewStock && (
                 <span className="bg-[#DC2626] text-white text-xs font-bold px-3 py-1.5 rounded-sm uppercase tracking-wider">
-                  New
+                  {t('product.new')}
                 </span>
               )}
               {!isMotorbike(product) && (
@@ -181,7 +183,7 @@ export default function ProductDetailModal({
                   ) : (
                     <XCircle className="h-3.5 w-3.5" />
                   )}
-                  {product.inStock ? 'In Stock' : 'Out of Stock'}
+                  {product.inStock ? t('product.inStock') : t('product.outOfStock')}
                 </span>
               )}
             </div>
@@ -191,7 +193,7 @@ export default function ProductDetailModal({
           <div className="lg:w-1/2 p-4 sm:p-6 lg:p-8 flex flex-col pb-20 sm:pb-6 lg:pb-8">
             {/* Category / Type Tag */}
             <p className="text-[#DC2626] text-xs font-bold uppercase tracking-[0.15em] mb-2">
-              {isMotorbike(product) ? `Category: ${product.category}` : `Type: ${product.type}`}
+              {isMotorbike(product) ? `${t('product.category')} ${product.category}` : `${t('product.type')} ${product.type}`}
             </p>
 
             {/* Name */}
@@ -201,7 +203,7 @@ export default function ProductDetailModal({
 
             {/* Brand */}
             <p className="text-gray-500 text-sm font-medium mt-1">
-              Brand: <span className="text-[#111111] font-bold">{product.brand}</span>
+              {t('product.brand')} <span className="text-[#111111] font-bold">{product.brand}</span>
             </p>
 
             {/* Price */}
@@ -224,7 +226,7 @@ export default function ProductDetailModal({
                     <Calendar className="h-4 w-4 text-[#DC2626]" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Year</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">{t('product.year')}</p>
                     <p className="text-sm font-bold text-[#111111]">{product.year}</p>
                   </div>
                 </div>
@@ -233,7 +235,7 @@ export default function ProductDetailModal({
                     <Cog className="h-4 w-4 text-[#DC2626]" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Engine</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">{t('product.engine')}</p>
                     <p className="text-sm font-bold text-[#111111]">{product.engineSize}</p>
                   </div>
                 </div>
@@ -242,8 +244,8 @@ export default function ProductDetailModal({
                     <Gauge className="h-4 w-4 text-[#DC2626]" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Mileage</p>
-                    <p className="text-sm font-bold text-[#111111]">{product.mileage || 'N/A'}</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">{t('product.mileage')}</p>
+                    <p className="text-sm font-bold text-[#111111]">{product.mileage || t('product.na')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -251,8 +253,8 @@ export default function ProductDetailModal({
                     <Paintbrush className="h-4 w-4 text-[#DC2626]" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Color</p>
-                    <p className="text-sm font-bold text-[#111111]">{product.color || 'N/A'}</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">{t('product.color')}</p>
+                    <p className="text-sm font-bold text-[#111111]">{product.color || t('product.na')}</p>
                   </div>
                 </div>
               </div>
@@ -266,7 +268,7 @@ export default function ProductDetailModal({
                     <Settings className="h-4 w-4 text-[#DC2626]" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Compatibility</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">{t('product.compatibility')}</p>
                     <p className="text-sm font-bold text-[#111111]">{product.compatibility}</p>
                   </div>
                 </div>
@@ -304,8 +306,8 @@ export default function ProductDetailModal({
                 className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-bold py-3 rounded-sm transition-colors flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />
-                <span className="hidden sm:inline">Add to Cart</span>
-                <span className="sm:hidden">Cart</span>
+                <span className="hidden sm:inline">{t('product.addToCart')}</span>
+                <span className="sm:hidden">{t('product.cart')}</span>
               </button>
               <button
                 onClick={() => toggleLike(product.id)}
@@ -337,7 +339,7 @@ export default function ProductDetailModal({
                 rel="noopener noreferrer"
                 className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-5 py-3 rounded-sm transition-colors flex items-center justify-center gap-2 shrink-0"
               >
-                Buy Now
+                {t('product.buyNow')}
               </a>
             </div>
           </div>

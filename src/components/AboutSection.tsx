@@ -2,31 +2,33 @@
 
 import { motion } from 'framer-motion'
 import { Wrench, ShieldCheck, HeadphonesIcon, BadgePercent, ArrowRight } from 'lucide-react'
-
-const features = [
-  {
-    icon: Wrench,
-    title: 'Wide Selection',
-    desc: 'Hundreds of motorbikes and spare parts from top brands',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Quality Parts',
-    desc: 'Genuine and OEM-equivalent parts you can trust',
-  },
-  {
-    icon: HeadphonesIcon,
-    title: 'Expert Support',
-    desc: 'Our experienced team helps you find exactly what you need',
-  },
-  {
-    icon: BadgePercent,
-    title: 'Best Prices',
-    desc: 'Competitive pricing without compromising on quality',
-  },
-]
+import { useTranslation } from '@/lib/i18n'
 
 export default function AboutSection() {
+  const { t } = useTranslation()
+
+  const features = [
+    {
+      icon: Wrench,
+      title: t('about.wideSelection'),
+      desc: t('about.wideSelectionDesc'),
+    },
+    {
+      icon: ShieldCheck,
+      title: t('about.qualityParts'),
+      desc: t('about.qualityPartsDesc'),
+    },
+    {
+      icon: HeadphonesIcon,
+      title: t('about.expertSupport'),
+      desc: t('about.expertSupportDesc'),
+    },
+    {
+      icon: BadgePercent,
+      title: t('about.bestPrices'),
+      desc: t('about.bestPricesDesc'),
+    },
+  ]
   return (
     <section id="about" className="py-20 md:py-28 bg-white relative overflow-hidden">
       {/* Background decorative elements */}
@@ -66,7 +68,7 @@ export default function AboutSection() {
               className="absolute -bottom-6 -left-4 md:-left-8 bg-[#DC2626] text-white p-5 md:p-6 shadow-xl hidden md:block"
             >
               <p className="text-3xl md:text-4xl font-black">5+</p>
-              <p className="text-white/80 text-sm mt-1">Years of<br/>Experience</p>
+              <p className="text-white/80 text-sm mt-1">{t('about.yearsExperience')}<br/>{t('about.experience')}</p>
             </motion.div>
           </motion.div>
 
@@ -80,25 +82,18 @@ export default function AboutSection() {
             <div className="inline-flex items-center gap-2 mb-4">
               <div className="w-8 h-[2px] bg-[#DC2626]" />
               <p className="text-[#DC2626] font-bold text-sm uppercase tracking-[0.15em]">
-                ABOUT MOKA MOTORS
+                {t('about.tag')}
               </p>
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#111111] mb-6 leading-tight">
-              Your Trusted Partner for{' '}
-              <span className="text-[#DC2626]">Motorbikes</span> & Spare Parts
+              {t('about.heading1')}{' '}
+              <span className="text-[#DC2626]">{t('about.headingHighlight')}</span> {t('about.heading2')}
             </h2>
             <p className="text-[#6B7280] text-base md:text-lg mb-4 leading-relaxed">
-              Located in the heart of Kariakoo, Dar es Salaam, Moka Motors has been
-              serving motorcycle enthusiasts and mechanics with the finest selection
-              of bikes and genuine spare parts. Our commitment to quality and
-              customer satisfaction sets us apart from the competition.
+              {t('about.paragraph1')}
             </p>
             <p className="text-[#6B7280] text-base md:text-lg mb-8 leading-relaxed">
-              Whether you&apos;re looking for a brand-new sport bike, a reliable
-              commuter, or hard-to-find spare parts, our expert team is here to help
-              you find exactly what you need at the best prices in Tanzania. We stock
-              parts from Honda, Yamaha, Kawasaki, and KTM — ensuring you always ride
-              with confidence.
+              {t('about.paragraph2')}
             </p>
 
             {/* Feature Grid */}

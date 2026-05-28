@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { useCartStore } from '@/store/cartStore'
 import { useLikeStore } from '@/store/likeStore'
 import { getProductInquiryMessage, getWhatsAppUrl } from '@/lib/whatsapp'
@@ -23,6 +24,7 @@ interface SparePart {
 }
 
 export default function SparePartCard({ part }: { part: SparePart }) {
+  const { t } = useTranslation()
   const { addItem } = useCartStore()
   const { toggleLike, isLiked } = useLikeStore()
   const liked = isLiked(part.id)
@@ -55,7 +57,7 @@ export default function SparePartCard({ part }: { part: SparePart }) {
       brand: part.brand,
       type: 'spare-part',
     })
-    toast.success(`${part.name} added to cart!`)
+    toast.success(t('product.addedToCart', { name: part.name }))
   }
 
   return (
@@ -107,7 +109,7 @@ export default function SparePartCard({ part }: { part: SparePart }) {
           <div className="absolute top-3 left-3 flex gap-2 z-10">
             {part.featured && (
               <span className="bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-sm flex items-center gap-1 uppercase tracking-wider">
-                <Star className="h-3 w-3" /> Featured
+                <Star className="h-3 w-3" /> {t('product.featured')}
               </span>
             )}
             <span
@@ -122,14 +124,14 @@ export default function SparePartCard({ part }: { part: SparePart }) {
               ) : (
                 <XCircle className="h-3 w-3" />
               )}
-              {part.inStock ? 'In Stock' : 'Out of Stock'}
+              {part.inStock ? t('product.inStock') : t('product.outOfStock')}
             </span>
           </div>
           {/* Like Button */}
           <button
             onClick={(e) => { e.stopPropagation(); toggleLike(part.id) }}
             className="absolute top-3 right-3 bg-white/90 hover:bg-white p-2 rounded-full transition-all shadow-sm hover:shadow-md z-10"
-            aria-label="Like"
+            aria-label={t('product.like')}
           >
             <svg
               className={`h-5 w-5 transition-colors ${
@@ -154,7 +156,7 @@ export default function SparePartCard({ part }: { part: SparePart }) {
         <div className="p-4">
           <div className="flex items-center justify-between mb-1">
             <p className="text-[#DC2626] text-[10px] font-bold uppercase tracking-[0.15em]">
-              Type: {part.type}
+              {t('product.type')} {part.type}
             </p>
           </div>
           <h3 className="text-[#111111] font-black text-lg leading-tight">{part.name}</h3>
@@ -167,7 +169,7 @@ export default function SparePartCard({ part }: { part: SparePart }) {
             <div className="flex items-center gap-2">
               <Settings className="h-3.5 w-3.5 text-gray-400 shrink-0" />
               <div>
-                <p className="text-[10px] text-gray-400 uppercase tracking-wider">Compatibility</p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider">{t('product.compatibility')}</p>
                 <p className="text-xs font-semibold text-[#111111]">{part.compatibility}</p>
               </div>
             </div>
@@ -181,7 +183,7 @@ export default function SparePartCard({ part }: { part: SparePart }) {
               className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-bold py-2.5 rounded-sm transition-colors flex items-center justify-center gap-1.5"
             >
               <ShoppingCart className="h-4 w-4" />
-              <span className="sm:inline">Add to Cart</span>
+              <span className="sm:inline">{t('product.addToCart')}</span>
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); toggleLike(part.id) }}
@@ -209,7 +211,7 @@ export default function SparePartCard({ part }: { part: SparePart }) {
               onClick={(e) => e.stopPropagation()}
               className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2.5 rounded-sm transition-colors flex items-center justify-center gap-1.5 shrink-0"
             >
-                Buy Now
+                {t('product.buyNow')}
             </a>
           </div>
         </div>

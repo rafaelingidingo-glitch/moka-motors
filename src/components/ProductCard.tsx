@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { useCartStore } from '@/store/cartStore'
 import { useLikeStore } from '@/store/likeStore'
 import { getProductInquiryMessage, getWhatsAppUrl } from '@/lib/whatsapp'
@@ -28,6 +29,7 @@ interface Motorbike {
 export default function ProductCard({ bike }: { bike: Motorbike }) {
   const { addItem } = useCartStore()
   const { toggleLike, isLiked } = useLikeStore()
+  const { t } = useTranslation()
   const liked = isLiked(bike.id)
   const images = parseImages(bike.images)
   const [currentImage, setCurrentImage] = useState(0)
@@ -57,7 +59,7 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
       brand: bike.brand,
       type: 'motorbike',
     })
-    toast.success(`${bike.name} added to cart!`)
+    toast.success(t('product.addedToCart', { name: bike.name }))
   }
 
   return (
@@ -109,12 +111,12 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
           <div className="absolute top-3 left-3 flex gap-2 z-10">
             {bike.featured && (
               <span className="bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-sm flex items-center gap-1 uppercase tracking-wider">
-                <Star className="h-3 w-3" /> Featured
+                <Star className="h-3 w-3" /> {t('product.featured')}
               </span>
             )}
             {bike.isNewStock && (
               <span className="bg-[#DC2626] text-white text-[10px] font-bold px-2.5 py-1 rounded-sm uppercase tracking-wider">
-                New
+                {t('product.new')}
               </span>
             )}
           </div>
@@ -122,7 +124,7 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
           <button
             onClick={(e) => { e.stopPropagation(); toggleLike(bike.id) }}
             className="absolute top-3 right-3 bg-white/90 hover:bg-white p-2 rounded-full transition-all shadow-sm hover:shadow-md z-10"
-            aria-label="Like"
+            aria-label={t('product.like')}
           >
             <svg
               className={`h-5 w-5 transition-colors ${
@@ -138,7 +140,7 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
           {/* Powered by brand overlay */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-3">
             <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest">
-              Powered by {bike.brand}
+              {t('product.poweredBy', { brand: bike.brand })}
             </p>
           </div>
         </div>
@@ -148,7 +150,7 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
           {/* Category Tag */}
           <div className="flex items-center justify-between mb-1">
             <p className="text-[#DC2626] text-[10px] font-bold uppercase tracking-[0.15em]">
-              Category: {bike.category}
+              {t('product.category')} {bike.category}
             </p>
           </div>
           <h3 className="text-[#111111] font-black text-lg leading-tight">{bike.name}</h3>
@@ -162,22 +164,22 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
               <div className="flex items-center justify-center gap-1 text-gray-400 mb-1">
                 <Calendar className="h-3 w-3" />
               </div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">Year</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider">{t('product.year')}</p>
               <p className="text-xs font-bold text-[#111111]">{bike.year}</p>
             </div>
             <div className="text-center border-x border-gray-200">
               <div className="flex items-center justify-center gap-1 text-gray-400 mb-1">
                 <Cog className="h-3 w-3" />
               </div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">Engine</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider">{t('product.engine')}</p>
               <p className="text-xs font-bold text-[#111111]">{bike.engineSize}</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-1 text-gray-400 mb-1">
                 <Gauge className="h-3 w-3" />
               </div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">Mileage</p>
-              <p className="text-xs font-bold text-[#111111]">{bike.mileage || 'N/A'}</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider">{t('product.mileage')}</p>
+              <p className="text-xs font-bold text-[#111111]">{bike.mileage || t('product.na')}</p>
             </div>
           </div>
 
@@ -188,7 +190,7 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
               className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold py-2.5 rounded-sm transition-colors flex items-center justify-center gap-1.5"
             >
               <ShoppingCart className="h-4 w-4" />
-              <span className="sm:inline">Add to Cart</span>
+              <span className="sm:inline">{t('product.addToCart')}</span>
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); toggleLike(bike.id) }}
@@ -216,7 +218,7 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
               onClick={(e) => e.stopPropagation()}
               className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2.5 rounded-sm transition-colors flex items-center justify-center gap-1.5 shrink-0"
             >
-                Buy Now
+                {t('product.buyNow')}
             </a>
           </div>
         </div>

@@ -1,8 +1,10 @@
 'use client'
 
 import { Instagram, Facebook, MessageCircle, ArrowUp } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 export default function Footer() {
+  const { t } = useTranslation()
   const currentYear = new Date().getFullYear()
 
   const scrollToTop = () => {
@@ -26,8 +28,7 @@ export default function Footer() {
               />
             </div>
             <p className="text-gray-500 text-sm leading-relaxed mb-4">
-              Your trusted partner for premium motorbikes and genuine spare parts in
-              Dar es Salaam, Tanzania.
+              {t('footer.description')}
             </p>
             {/* Social Icons Row */}
             <div className="flex items-center gap-3">
@@ -59,16 +60,16 @@ export default function Footer() {
           {/* Column 2 - Quick Links */}
           <div>
             <h3 className="text-white font-black text-sm uppercase tracking-wider mb-5">
-              Quick Links
+              {t('footer.quickLinks')}
             </h3>
             <ul className="space-y-3">
               {[
-                { label: 'Home', href: '#home' },
-                { label: 'About Us', href: '#about' },
-                { label: 'New Stock', href: '#new-stock' },
-                { label: 'Motorbikes', href: '#motorbikes' },
-                { label: 'Spare Parts', href: '#spare-parts' },
-                { label: 'Contact', href: '#contact' },
+                { label: t('footer.home'), href: '#home' },
+                { label: t('footer.aboutUs'), href: '#about' },
+                { label: t('footer.newStock'), href: '#new-stock' },
+                { label: t('footer.motorbikes'), href: '#motorbikes' },
+                { label: t('footer.spareParts'), href: '#spare-parts' },
+                { label: t('footer.contact'), href: '#contact' },
               ].map((link) => (
                 <li key={link.href}>
                   <a
@@ -92,20 +93,20 @@ export default function Footer() {
           {/* Column 3 - Contact */}
           <div>
             <h3 className="text-white font-black text-sm uppercase tracking-wider mb-5">
-              Contact Info
+              {t('footer.contactInfo')}
             </h3>
             <ul className="space-y-3">
               <li className="text-gray-500 text-sm flex items-start gap-2">
                 <span className="text-[#DC2626] mt-0.5">▪</span>
                 <div>
-                  <span className="text-gray-300 font-semibold">Address:</span>
+                  <span className="text-gray-300 font-semibold">{t('footer.addressLabel')}</span>
                   <br />Kariakoo, Dar es Salaam, Tanzania
                 </div>
               </li>
               <li className="text-gray-500 text-sm flex items-start gap-2">
                 <span className="text-[#DC2626] mt-0.5">▪</span>
                 <div>
-                  <span className="text-gray-300 font-semibold">Phone:</span>{' '}
+                  <span className="text-gray-300 font-semibold">{t('footer.phoneLabel')}</span>{' '}
                   <a
                     href="tel:+255625260000"
                     className="hover:text-[#DC2626] transition-colors"
@@ -117,7 +118,7 @@ export default function Footer() {
               <li className="text-gray-500 text-sm flex items-start gap-2">
                 <span className="text-[#DC2626] mt-0.5">▪</span>
                 <div>
-                  <span className="text-gray-300 font-semibold">Email:</span>{' '}
+                  <span className="text-gray-300 font-semibold">{t('footer.emailLabel')}</span>{' '}
                   <a
                     href="mailto:info@mokamotors.co.tz"
                     className="hover:text-[#DC2626] transition-colors"
@@ -129,7 +130,7 @@ export default function Footer() {
               <li className="text-gray-500 text-sm flex items-start gap-2">
                 <span className="text-[#DC2626] mt-0.5">▪</span>
                 <div>
-                  <span className="text-gray-300 font-semibold">Instagram:</span>{' '}
+                  <span className="text-gray-300 font-semibold">{t('footer.instagramLabel')}</span>{' '}
                   <a
                     href="https://www.instagram.com/moka_motor/"
                     target="_blank"
@@ -146,7 +147,7 @@ export default function Footer() {
           {/* Column 4 - Brands */}
           <div>
             <h3 className="text-white font-black text-sm uppercase tracking-wider mb-5">
-              Brands We Carry
+              {t('footer.brandsWeCarry')}
             </h3>
             <div className="grid grid-cols-2 gap-3">
               {['Honda', 'Kawasaki', 'KTM', 'Yamaha'].map((brand) => (
@@ -166,7 +167,7 @@ export default function Footer() {
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-[#DC2626] to-[#B91C1C] text-white font-bold px-5 py-2.5 rounded-sm text-sm hover:shadow-lg hover:shadow-[#DC2626]/20 transition-all"
               >
                 <Instagram className="h-4 w-4" />
-                Follow @moka_motor
+                {t('footer.followInstagram')}
               </a>
             </div>
           </div>
@@ -176,11 +177,11 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-gray-600 text-sm">
-              © {currentYear} Moka Motors. All rights reserved.
+              {t('footer.copyright', { year: currentYear })}
             </p>
             <div className="flex items-center gap-4">
               <p className="text-gray-600 text-sm italic">
-                Moka Motors — Kariakoo, Dar es Salaam
+                {t('footer.tagline')}
               </p>
               <button
                 onClick={scrollToTop}

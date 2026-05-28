@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { ChevronDown, ChevronUp, X, SlidersHorizontal, Bike } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface FilterState {
   brands: string[]
@@ -23,7 +24,7 @@ interface FilterSidebarProps {
 }
 
 const bikeBrands = ['Honda', 'Kawasaki', 'KTM', 'Yamaha']
-const bikeCategories = ['Sport', 'Cruiser', 'Off-Road', 'Standard', 'Scooter']
+const bikeCategoryKeys = ['Sport', 'Cruiser', 'Off-Road', 'Standard', 'Scooter'] as const
 const partBrands = ['Honda', 'Yamaha', 'Kawasaki', 'KTM', 'Universal']
 const partTypes = [
   'Engine Parts',
@@ -46,6 +47,7 @@ export default function FilterSidebar({
   isOpen,
   onToggle,
 }: FilterSidebarProps) {
+  const { t } = useTranslation()
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     brand: true,
     category: true,
@@ -72,9 +74,16 @@ export default function FilterSidebar({
     onFilterChange({ ...filters, categories: newCats })
   }
 
+  const bikeCategoryLabels: Record<string, string> = {
+    'Sport': t('filter.categories.sport'),
+    'Cruiser': t('filter.categories.cruiser'),
+    'Off-Road': t('filter.categories.offRoad'),
+    'Standard': t('filter.categories.standard'),
+    'Scooter': t('filter.categories.scooter'),
+  }
+
   const brands = type === 'motorbike' ? bikeBrands : partBrands
-  const categories = type === 'motorbike' ? bikeCategories : partTypes
-  const categoryLabel = type === 'motorbike' ? 'Category' : 'Type'
+  const categories = type === 'motorbike' ? bikeCategoryKeys : partTypes
 
   const activeFilterCount =
     filters.brands.length +
@@ -93,7 +102,7 @@ export default function FilterSidebar({
           <SlidersHorizontal className="h-5 w-5" />
         )}
         <h3 className="font-black text-sm uppercase tracking-wider">
-          {type === 'motorbike' ? 'Search Options' : 'Filter Parts'}
+          {type === 'motorbike' ? t('filter.searchOptions') : t('filter.filterParts')}
         </h3>
         {activeFilterCount > 0 && (
           <span className="ml-auto bg-white text-[#DC2626] text-xs font-bold px-2 py-0.5 rounded-full">
@@ -105,12 +114,12 @@ export default function FilterSidebar({
       {/* Clear All */}
       {activeFilterCount > 0 && (
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-          <span className="text-xs text-gray-500">{activeFilterCount} filters active</span>
+          <span className="text-xs text-gray-500">{t('filter.filtersActive', { count: activeFilterCount })}</span>
           <button
             onClick={onClear}
             className="text-[#DC2626] text-xs font-bold hover:underline uppercase tracking-wider"
           >
-            Clear All Filters
+            {t('filter.clearAll')}
           </button>
         </div>
       )}
@@ -131,7 +140,7 @@ export default function FilterSidebar({
           onClick={() => toggleSection('brand')}
           className="flex items-center justify-between w-full py-3 font-bold text-xs uppercase tracking-wider text-[#111111]"
         >
-          Select a Make
+          {t('filter.selectMake')}
           {expandedSections.brand ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
           ) : (
@@ -165,7 +174,7 @@ export default function FilterSidebar({
           onClick={() => toggleSection('category')}
           className="flex items-center justify-between w-full py-3 font-bold text-xs uppercase tracking-wider text-[#111111]"
         >
-          {categoryLabel === 'Category' ? 'Select Category' : 'Select Type'}
+          {type === 'motorbike' ? t('filter.selectCategory') : t('filter.selectType')}
           {expandedSections.category ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
           ) : (
@@ -185,7 +194,7 @@ export default function FilterSidebar({
                   className="data-[state=checked]:bg-[#DC2626] data-[state=checked]:border-[#DC2626]"
                 />
                 <span className="text-sm text-gray-600 group-hover:text-[#111111] transition-colors">
-                  {cat}
+                  {type === 'motorbike' ? (bikeCategoryLabels[cat] || cat) : cat}
                 </span>
               </label>
             ))}
@@ -199,7 +208,7 @@ export default function FilterSidebar({
           onClick={() => toggleSection('price')}
           className="flex items-center justify-between w-full py-3 font-bold text-xs uppercase tracking-wider text-[#111111]"
         >
-          Price Range
+          {t('filter.priceRange')}
           {expandedSections.price ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
           ) : (
@@ -209,12 +218,12 @@ export default function FilterSidebar({
         {expandedSections.price && (
           <div className="mt-2 px-1 space-y-3">
             <p className="text-xs text-[#DC2626] font-semibold">
-              Range: TZS {filters.priceRange[0].toLocaleString()} — {isFinite(filters.priceRange[1]) ? `TZS ${filters.priceRange[1].toLocaleString()}` : 'No Limit'}
+              Range: TZS {filters.priceRange[0].toLocaleString()} — {isFinite(filters.priceRange[1]) ? `TZS ${filters.priceRange[1].toLocaleString()}` : t('filter.noLimit')}
             </p>
             <div className="flex items-center gap-2">
               <div className="flex-1">
                 <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
-                  Min Price
+                  {t('filter.minPrice')}
                 </label>
                 <div className="relative">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">TZS</span>
@@ -239,7 +248,7 @@ export default function FilterSidebar({
               <span className="text-gray-300 mt-5">—</span>
               <div className="flex-1">
                 <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
-                  Max Price
+                  {t('filter.maxPrice')}
                 </label>
                 <div className="relative">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">TZS</span>
@@ -256,7 +265,7 @@ export default function FilterSidebar({
                         })
                       }
                     }}
-                    placeholder="No limit"
+                    placeholder={t('filter.noLimit')}
                     className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance:none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
@@ -273,7 +282,7 @@ export default function FilterSidebar({
             onClick={() => toggleSection('year')}
             className="flex items-center justify-between w-full py-3 font-bold text-xs uppercase tracking-wider text-[#111111]"
           >
-            Model Year
+            {t('filter.modelYear')}
             {expandedSections.year ? (
               <ChevronUp className="h-4 w-4 text-gray-400" />
             ) : (
@@ -285,7 +294,7 @@ export default function FilterSidebar({
               <div className="flex items-center gap-2">
                 <div className="flex-1">
                   <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
-                    From Year
+                    {t('filter.fromYear')}
                   </label>
                   <input
                     type="number"
@@ -302,14 +311,14 @@ export default function FilterSidebar({
                         })
                       }
                     }}
-                    placeholder="e.g. 2020"
+                    placeholder={t('filter.yearPlaceholder')}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance:none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
                 <span className="text-gray-300 mt-5">—</span>
                 <div className="flex-1">
                   <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
-                    To Year
+                    {t('filter.toYear')}
                   </label>
                   <input
                     type="number"
@@ -326,7 +335,7 @@ export default function FilterSidebar({
                         })
                       }
                     }}
-                    placeholder={`e.g. ${currentYear}`}
+                    placeholder={t('filter.yearPlaceholder')}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance:none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
@@ -343,7 +352,7 @@ export default function FilterSidebar({
             onClick={() => toggleSection('engineSize')}
             className="flex items-center justify-between w-full py-3 font-bold text-xs uppercase tracking-wider text-[#111111]"
           >
-            Engine Size
+            {t('filter.engineSize')}
             {expandedSections.engineSize ? (
               <ChevronUp className="h-4 w-4 text-gray-400" />
             ) : (
@@ -383,7 +392,7 @@ export default function FilterSidebar({
           onClick={onToggle}
           className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-sm"
         >
-          APPLY FILTER
+          {t('filter.apply')}
         </Button>
       </div>
     </div>
@@ -399,7 +408,7 @@ export default function FilterSidebar({
           className="flex items-center gap-2 border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-sm"
         >
           <SlidersHorizontal className="h-4 w-4" />
-          Filters
+          {t('filter.filters')}
           {activeFilterCount > 0 && (
             <span className="bg-[#DC2626] text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
               {activeFilterCount}

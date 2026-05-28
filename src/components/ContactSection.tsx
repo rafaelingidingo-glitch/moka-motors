@@ -5,8 +5,10 @@ import { motion } from 'framer-motion'
 import { MapPin, Phone, Mail, Instagram, MessageCircle, Send } from 'lucide-react'
 import { getContactFormMessage, getWhatsAppUrl } from '@/lib/whatsapp'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n'
 
 export default function ContactSection() {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,7 +22,7 @@ export default function ContactSection() {
       getContactFormMessage(formData.name, formData.email, formData.phone, formData.message)
     )
     window.open(whatsappUrl, '_blank')
-    toast.success('Opening WhatsApp to send your message!')
+    toast.success(t('contact.whatsappToast'))
   }
 
   return (
@@ -39,15 +41,15 @@ export default function ContactSection() {
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="w-8 h-[2px] bg-[#DC2626]" />
             <p className="text-[#DC2626] font-bold text-sm uppercase tracking-[0.15em]">
-              GET IN TOUCH
+              {t('contact.tag')}
             </p>
             <div className="w-8 h-[2px] bg-[#DC2626]" />
           </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-white">
-            Contact <span className="text-[#DC2626]">Us</span>
+            {t('contact.heading1')} <span className="text-[#DC2626]">{t('contact.heading2')}</span>
           </h2>
           <p className="text-gray-400 mt-4 max-w-2xl mx-auto">
-            Have questions? Reach out to us directly — we respond fastest on WhatsApp.
+            {t('contact.description')}
           </p>
         </motion.div>
 
@@ -61,12 +63,12 @@ export default function ContactSection() {
           >
             <div className="bg-[#1A1A1A] rounded-sm p-6 md:p-8 border border-gray-800">
               <h3 className="text-xl font-black text-white mb-6">
-                Send us a Message
+                {t('contact.sendMessage')}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">
-                    Full Name
+                    {t('contact.fullName')}
                   </label>
                   <input
                     type="text"
@@ -76,13 +78,13 @@ export default function ContactSection() {
                       setFormData({ ...formData, name: e.target.value })
                     }
                     className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                    placeholder="Your name"
+                    placeholder={t('contact.namePlaceholder')}
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-300 mb-2">
-                      Email Address
+                      {t('contact.emailAddress')}
                     </label>
                     <input
                       type="email"
@@ -92,12 +94,12 @@ export default function ContactSection() {
                         setFormData({ ...formData, email: e.target.value })
                       }
                       className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                      placeholder="your@email.com"
+                      placeholder={t('contact.emailPlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-300 mb-2">
-                      Phone Number
+                      {t('contact.phoneNumber')}
                     </label>
                     <input
                       type="tel"
@@ -107,13 +109,13 @@ export default function ContactSection() {
                         setFormData({ ...formData, phone: e.target.value })
                       }
                       className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                      placeholder="+255 xxx xxx xxx"
+                      placeholder={t('contact.phonePlaceholder')}
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">
-                    Message
+                    {t('contact.message')}
                   </label>
                   <textarea
                     required
@@ -123,14 +125,14 @@ export default function ContactSection() {
                       setFormData({ ...formData, message: e.target.value })
                     }
                     className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all resize-none"
-                    placeholder="Tell us what you're looking for..."
+                    placeholder={t('contact.messagePlaceholder')}
                   />
                 </div>
                 <button
                   type="submit"
                   className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold py-4 rounded-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#DC2626]/20 hover:shadow-[#DC2626]/30"
                 >
-                  Send via WhatsApp
+                  {t('contact.sendWhatsApp')}
                 </button>
               </form>
             </div>
@@ -147,31 +149,31 @@ export default function ContactSection() {
             {/* Info Cards */}
             <div className="bg-[#1A1A1A] rounded-sm p-6 md:p-8 border border-gray-800">
               <h3 className="text-xl font-black text-white mb-6">
-                Visit Our Shop
+                {t('contact.visitShop')}
               </h3>
               <div className="space-y-5">
                 {[
                   {
                     icon: MapPin,
-                    label: 'Address',
+                    label: t('contact.address'),
                     value: 'Kariakoo, Dar es Salaam, Tanzania',
                     href: 'https://maps.google.com/?q=Kariakoo+Dar+es+Salaam+Tanzania',
                   },
                   {
                     icon: Phone,
-                    label: 'Phone',
+                    label: t('contact.phone'),
                     value: '+255 625 260000',
                     href: 'tel:+255625260000',
                   },
                   {
                     icon: Mail,
-                    label: 'Email',
+                    label: t('contact.email'),
                     value: 'info@mokamotors.co.tz',
                     href: 'mailto:info@mokamotors.co.tz',
                   },
                   {
                     icon: Instagram,
-                    label: 'Instagram',
+                    label: t('contact.instagram'),
                     value: '@moka_motor',
                     href: 'https://www.instagram.com/moka_motor/',
                   },
@@ -202,11 +204,10 @@ export default function ContactSection() {
               <div className="relative">
                 <div className="flex items-center gap-3 mb-3">
                   <MessageCircle className="h-7 w-7" />
-                  <h3 className="text-xl font-black">WhatsApp Us</h3>
+                  <h3 className="text-xl font-black">{t('contact.whatsappUs')}</h3>
                 </div>
                 <p className="text-green-100 text-sm mb-4">
-                  Get instant responses! Chat with us directly on WhatsApp for
-                  inquiries, orders, and support.
+                  {t('contact.whatsappDesc')}
                 </p>
                 <a
                   href={getWhatsAppUrl(
@@ -217,7 +218,7 @@ export default function ContactSection() {
                   className="inline-flex items-center gap-2 bg-white text-green-700 font-bold px-6 py-3 rounded-sm hover:bg-green-50 transition-colors"
                 >
                   <MessageCircle className="h-5 w-5" />
-                  Chat on WhatsApp
+                  {t('contact.chatWhatsApp')}
                 </a>
               </div>
             </div>
@@ -238,7 +239,7 @@ export default function ContactSection() {
                     rel="noopener noreferrer"
                     className="text-[#DC2626] text-sm font-bold hover:underline mt-2 inline-flex items-center gap-1"
                   >
-                    Open in Google Maps →
+                    {t('contact.openMaps')}
                   </a>
                 </div>
               </div>

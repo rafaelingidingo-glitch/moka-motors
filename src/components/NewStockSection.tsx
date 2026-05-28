@@ -8,6 +8,7 @@ import { useLikeStore } from '@/store/likeStore'
 import { getProductInquiryMessage, getWhatsAppUrl } from '@/lib/whatsapp'
 import { parseImages } from '@/lib/utils'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n'
 
 interface Motorbike {
   id: string
@@ -29,6 +30,7 @@ export default function NewStockSection() {
   const [bikes, setBikes] = useState<Motorbike[]>([])
   const { addItem } = useCartStore()
   const { toggleLike, isLiked } = useLikeStore()
+  const { t } = useTranslation()
 
   useEffect(() => {
     fetch('/api/motorbikes?isNewStock=true&sort=newest')
@@ -63,15 +65,15 @@ export default function NewStockSection() {
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="w-8 h-[2px] bg-[#DC2626]" />
             <p className="text-[#DC2626] font-bold text-sm uppercase tracking-[0.15em]">
-              JUST ARRIVED
+              {t('newStock.tag')}
             </p>
             <div className="w-8 h-[2px] bg-[#DC2626]" />
           </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-4">
-            New Stock <span className="text-[#DC2626]">Available</span>
+            {t('newStock.heading1')} <span className="text-[#DC2626]">{t('newStock.heading2')}</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Check out our latest arrivals — fresh off the container, ready for you to ride.
+            {t('newStock.description')}
           </p>
         </motion.div>
 
@@ -95,7 +97,7 @@ export default function NewStockSection() {
                 />
                 <div className="absolute top-3 left-3">
                   <span className="bg-[#DC2626] text-white text-[10px] font-bold px-2.5 py-1 rounded-sm flex items-center gap-1 uppercase tracking-wider">
-                    <Sparkles className="h-3 w-3" /> NEW
+                    <Sparkles className="h-3 w-3" /> {t('newStock.badge')}
                   </span>
                 </div>
                 <button
@@ -149,11 +151,11 @@ export default function NewStockSection() {
                         brand: bike.brand,
                         type: 'motorbike',
                       })
-                      toast.success(`${bike.name} added to cart!`)
+                      toast.success(t('newStock.addedToCart', { name: bike.name }))
                     }}
                     className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold py-2.5 rounded-sm transition-colors"
                   >
-                    Add to Cart
+                    {t('newStock.addToCart')}
                   </button>
                   <a
                     href={getWhatsAppUrl(
@@ -163,7 +165,7 @@ export default function NewStockSection() {
                     rel="noopener noreferrer"
                     className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2.5 rounded-sm transition-colors"
                   >
-                    Buy Now
+                    {t('newStock.buyNow')}
                   </a>
                 </div>
               </div>
@@ -182,7 +184,7 @@ export default function NewStockSection() {
             onClick={scrollToMotorbikes}
             className="inline-flex items-center gap-2 border-2 border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white font-bold px-8 py-3 rounded-sm transition-all duration-300"
           >
-            View All Inventory
+            {t('newStock.viewAll')}
             <ArrowRight className="h-4 w-4" />
           </button>
         </motion.div>

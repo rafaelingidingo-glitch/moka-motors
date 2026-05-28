@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { motion } from 'framer-motion'
 import { SlidersHorizontal, ArrowUpDown, Wrench } from 'lucide-react'
 import SparePartCard from './SparePartCard'
@@ -60,6 +61,19 @@ export default function SparePartsInventory() {
     price: true,
     stock: true,
   })
+
+  const { t } = useTranslation()
+
+  const typeKeyMap: Record<string, string> = {
+    'Engine Parts': 'spareParts.types.engineParts',
+    'Body Parts': 'spareParts.types.bodyParts',
+    'Electrical': 'spareParts.types.electrical',
+    'Brakes': 'spareParts.types.brakes',
+    'Tires': 'spareParts.types.tires',
+    'Filters': 'spareParts.types.filters',
+    'Chain/Sprocket': 'spareParts.types.chainSprocket',
+    'Accessories': 'spareParts.types.accessories',
+  }
 
   useEffect(() => {
     fetch('/api/spare-parts')
@@ -133,7 +147,7 @@ export default function SparePartsInventory() {
       {/* Header Banner - matching design inspiration */}
       <div className="bg-[#DC2626] text-white px-4 py-3 flex items-center gap-2 -mx-5 -mt-5 mb-4">
         <SlidersHorizontal className="h-5 w-5" />
-        <h3 className="font-black text-sm uppercase tracking-wider">Filter Parts</h3>
+        <h3 className="font-black text-sm uppercase tracking-wider">{t('filter.filterParts')}</h3>
         {activeFilterCount > 0 && (
           <span className="ml-auto bg-white text-[#DC2626] text-xs font-bold px-2 py-0.5 rounded-full">
             {activeFilterCount}
@@ -144,7 +158,7 @@ export default function SparePartsInventory() {
       {/* Clear All */}
       {activeFilterCount > 0 && (
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-          <span className="text-xs text-gray-500">{activeFilterCount} filters active</span>
+          <span className="text-xs text-gray-500">{t('filter.filtersActive', { count: activeFilterCount })}</span>
           <button
             onClick={() => {
               setFilters(defaultFilters)
@@ -152,7 +166,7 @@ export default function SparePartsInventory() {
             }}
             className="text-[#DC2626] text-xs font-bold hover:underline uppercase tracking-wider"
           >
-            Clear All Filters
+            {t('filter.clearAll')}
           </button>
         </div>
       )}
@@ -173,7 +187,7 @@ export default function SparePartsInventory() {
           onClick={() => toggleSection('type')}
           className="flex items-center justify-between w-full py-3 font-bold text-xs uppercase tracking-wider text-[#111111]"
         >
-          Select Type
+          {t('filter.selectType')}
           {expandedSections.type ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
           ) : (
@@ -190,7 +204,7 @@ export default function SparePartsInventory() {
                   className="data-[state=checked]:bg-[#DC2626] data-[state=checked]:border-[#DC2626]"
                 />
                 <span className="text-sm text-gray-600 group-hover:text-[#111111] transition-colors">
-                  {type}
+                  {t(typeKeyMap[type] || type)}
                 </span>
               </label>
             ))}
@@ -204,7 +218,7 @@ export default function SparePartsInventory() {
           onClick={() => toggleSection('brand')}
           className="flex items-center justify-between w-full py-3 font-bold text-xs uppercase tracking-wider text-[#111111]"
         >
-          Select Brand
+          {t('filter.selectBrand')}
           {expandedSections.brand ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
           ) : (
@@ -238,7 +252,7 @@ export default function SparePartsInventory() {
           onClick={() => toggleSection('price')}
           className="flex items-center justify-between w-full py-3 font-bold text-xs uppercase tracking-wider text-[#111111]"
         >
-          Price Range
+          {t('filter.priceRange')}
           {expandedSections.price ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
           ) : (
@@ -248,12 +262,12 @@ export default function SparePartsInventory() {
         {expandedSections.price && (
           <div className="mt-2 px-1 space-y-3">
             <p className="text-xs text-[#DC2626] font-semibold">
-              Range: TZS {filters.priceRange[0].toLocaleString()} — {isFinite(filters.priceRange[1]) ? `TZS ${filters.priceRange[1].toLocaleString()}` : 'No Limit'}
+              Range: TZS {filters.priceRange[0].toLocaleString()} — {isFinite(filters.priceRange[1]) ? `TZS ${filters.priceRange[1].toLocaleString()}` : t('filter.noLimit')}
             </p>
             <div className="flex items-center gap-2">
               <div className="flex-1">
                 <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
-                  Min Price
+                  {t('filter.minPrice')}
                 </label>
                 <div className="relative">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">TZS</span>
@@ -276,7 +290,7 @@ export default function SparePartsInventory() {
               <span className="text-gray-300 mt-5">—</span>
               <div className="flex-1">
                 <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
-                  Max Price
+                  {t('filter.maxPrice')}
                 </label>
                 <div className="relative">
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">TZS</span>
@@ -291,7 +305,7 @@ export default function SparePartsInventory() {
                         setShowCount(6)
                       }
                     }}
-                    placeholder="No limit"
+                    placeholder={t('filter.noLimit')}
                     className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
@@ -307,7 +321,7 @@ export default function SparePartsInventory() {
           onClick={() => toggleSection('stock')}
           className="flex items-center justify-between w-full py-3 font-bold text-xs uppercase tracking-wider text-[#111111]"
         >
-          Availability
+          {t('filter.availability')}
           {expandedSections.stock ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
           ) : (
@@ -316,7 +330,7 @@ export default function SparePartsInventory() {
         </button>
         {expandedSections.stock && (
           <div className="flex items-center justify-between mt-2">
-            <span className="text-sm text-gray-600">In Stock Only</span>
+            <span className="text-sm text-gray-600">{t('filter.inStockOnly')}</span>
             <Switch
               checked={filters.inStockOnly}
               onCheckedChange={(checked) =>
@@ -333,7 +347,7 @@ export default function SparePartsInventory() {
           onClick={() => setIsFilterOpen(false)}
           className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-sm"
         >
-          APPLY FILTER
+          {t('filter.apply')}
         </Button>
       </div>
     </div>
@@ -352,15 +366,15 @@ export default function SparePartsInventory() {
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="w-8 h-[2px] bg-[#DC2626]" />
             <p className="text-[#DC2626] font-bold text-sm uppercase tracking-[0.15em]">
-              PARTS & ACCESSORIES
+              {t('spareParts.tag')}
             </p>
             <div className="w-8 h-[2px] bg-[#DC2626]" />
           </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-[#111111]">
-            Spare Parts <span className="text-[#DC2626]">Inventory</span>
+            {t('spareParts.heading1')} <span className="text-[#DC2626]">{t('spareParts.heading2')}</span>
           </h2>
           <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto">
-            Find the exact parts you need. Filter by type, brand, compatibility, and price.
+            {t('spareParts.description')}
           </p>
         </motion.div>
 
@@ -374,7 +388,7 @@ export default function SparePartsInventory() {
               className="flex items-center gap-2 border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-sm w-full justify-center"
             >
               <SlidersHorizontal className="h-4 w-4" />
-              Filters
+              {t('filter.filters')}
               {activeFilterCount > 0 && (
                 <span className="bg-[#DC2626] text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                   {activeFilterCount}
@@ -410,9 +424,9 @@ export default function SparePartsInventory() {
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 bg-[#F5F5F5] rounded-sm p-3 border border-gray-200">
               <p className="text-sm text-gray-600">
-                Your search returned{' '}
+                {t('spareParts.searchResults')}{' '}
                 <span className="font-black text-[#111111]">{filteredParts.length}</span>{' '}
-                parts
+                {t('spareParts.partsWord')}
               </p>
               <div className="flex items-center gap-1.5">
                 <ArrowUpDown className="h-4 w-4 text-gray-400" />
@@ -421,9 +435,9 @@ export default function SparePartsInventory() {
                   onChange={(e) => setSort(e.target.value)}
                   className="text-sm border border-gray-200 rounded-sm px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#DC2626] max-w-[180px]"
                 >
-                  <option value="newest">Featured First</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
+                  <option value="newest">{t('spareParts.sortFeatured')}</option>
+                  <option value="price-asc">{t('spareParts.sortPriceLow')}</option>
+                  <option value="price-desc">{t('spareParts.sortPriceHigh')}</option>
                 </select>
               </div>
             </div>
@@ -433,7 +447,7 @@ export default function SparePartsInventory() {
               <div className="text-center py-16 bg-[#F5F5F5] rounded-sm">
                 <Wrench className="h-16 w-16 text-gray-200 mx-auto mb-4" />
                 <p className="text-gray-400 text-lg">
-                  No spare parts match your filters.
+                  {t('spareParts.noMatch')}
                 </p>
                 <button
                   onClick={() => {
@@ -442,7 +456,7 @@ export default function SparePartsInventory() {
                   }}
                   className="text-[#DC2626] font-medium mt-2 hover:underline"
                 >
-                  Clear all filters
+                  {t('spareParts.clearFilters')}
                 </button>
               </div>
             ) : (
@@ -468,7 +482,7 @@ export default function SparePartsInventory() {
                   onClick={() => setShowCount((prev) => prev + 6)}
                   className="bg-[#111111] hover:bg-[#333333] text-white font-bold px-8 py-3 rounded-sm transition-colors"
                 >
-                  Load More ({filteredParts.length - showCount} remaining)
+                  {t('spareParts.loadMore')} ({filteredParts.length - showCount} {t('spareParts.remaining')})
                 </button>
               </div>
             )}

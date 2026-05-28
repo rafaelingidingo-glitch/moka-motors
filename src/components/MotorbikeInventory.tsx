@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Grid3X3, List, ArrowUpDown, Bike } from 'lucide-react'
 import ProductCard from './ProductCard'
 import FilterSidebar from './FilterSidebar'
+import { useTranslation } from '@/lib/i18n'
 
 interface Motorbike {
   id: string
@@ -40,6 +41,7 @@ const defaultFilters: FilterState = {
 }
 
 export default function MotorbikeInventory() {
+  const { t } = useTranslation()
   const [bikes, setBikes] = useState<Motorbike[]>([])
   const [filters, setFilters] = useState<FilterState>(defaultFilters)
   const [sort, setSort] = useState('newest')
@@ -132,16 +134,15 @@ export default function MotorbikeInventory() {
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="w-8 h-[2px] bg-[#DC2626]" />
             <p className="text-[#DC2626] font-bold text-sm uppercase tracking-[0.15em]">
-              OUR COLLECTION
+              {t('motorbikes.tag')}
             </p>
             <div className="w-8 h-[2px] bg-[#DC2626]" />
           </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-[#111111]">
-            Choose a <span className="text-[#DC2626]">Motorcycle</span>
+            {t('motorbikes.heading1')} <span className="text-[#DC2626]">{t('motorbikes.heading2')}</span>
           </h2>
           <p className="text-[#6B7280] mt-4 max-w-2xl mx-auto">
-            Browse our complete inventory of premium motorbikes from top brands.
-            Use the filters to find your perfect ride.
+            {t('motorbikes.description')}
           </p>
         </motion.div>
 
@@ -168,9 +169,9 @@ export default function MotorbikeInventory() {
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 bg-white rounded-sm p-3 border border-gray-200 shadow-sm">
               <p className="text-sm text-gray-600">
-                Your search returned{' '}
+                {t('motorbikes.searchResults')}{' '}
                 <span className="font-black text-[#111111]">{filteredBikes.length}</span>{' '}
-                results
+                {t('motorbikes.resultsWord')}
               </p>
               <div className="flex items-center justify-between sm:justify-end gap-3">
                 {/* Sort */}
@@ -181,11 +182,11 @@ export default function MotorbikeInventory() {
                     onChange={(e) => setSort(e.target.value)}
                     className="text-sm border border-gray-200 rounded-sm px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#DC2626] max-w-[180px]"
                   >
-                    <option value="newest">Newest First</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="year-desc">Year: Newest</option>
-                    <option value="year-asc">Year: Oldest</option>
+                    <option value="newest">{t('motorbikes.sortNewest')}</option>
+                    <option value="price-asc">{t('motorbikes.sortPriceLow')}</option>
+                    <option value="price-desc">{t('motorbikes.sortPriceHigh')}</option>
+                    <option value="year-desc">{t('motorbikes.sortYearNew')}</option>
+                    <option value="year-asc">{t('motorbikes.sortYearOld')}</option>
                   </select>
                 </div>
                 {/* View Toggle */}
@@ -218,12 +219,12 @@ export default function MotorbikeInventory() {
             {filteredBikes.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-sm">
                 <Bike className="h-16 w-16 text-gray-200 mx-auto mb-4" />
-                <p className="text-gray-400 text-lg">No motorbikes match your filters.</p>
+                <p className="text-gray-400 text-lg">{t('motorbikes.noMatch')}</p>
                 <button
                   onClick={() => setFilters(defaultFilters)}
                   className="text-[#DC2626] font-medium mt-2 hover:underline"
                 >
-                  Clear all filters
+                  {t('motorbikes.clearFilters')}
                 </button>
               </div>
             ) : (
@@ -255,7 +256,7 @@ export default function MotorbikeInventory() {
                   onClick={() => setShowCount((prev) => prev + 6)}
                   className="bg-[#111111] hover:bg-[#333333] text-white font-bold px-8 py-3 rounded-sm transition-colors"
                 >
-                  Load More ({filteredBikes.length - showCount} remaining)
+                  {t('motorbikes.loadMore')} ({filteredBikes.length - showCount} {t('motorbikes.remaining')})
                 </button>
               </div>
             )}

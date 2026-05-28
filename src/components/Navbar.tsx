@@ -5,15 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ShoppingCart, User } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useAdminStore } from '@/store/adminStore'
-
-const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'New Stock', href: '#new-stock' },
-  { label: 'Motorbikes', href: '#motorbikes' },
-  { label: 'Spare Parts', href: '#spare-parts' },
-  { label: 'Contact', href: '#contact' },
-]
+import { useTranslation } from '@/lib/i18n'
+import LanguageSwitcher from './LanguageSwitcher'
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -21,6 +14,16 @@ export default function Navbar() {
   const { getItemCount, toggleCart } = useCartStore()
   const { isLoggedIn, openAdminPage } = useAdminStore()
   const itemCount = getItemCount()
+  const { t } = useTranslation()
+
+  const navLinks = [
+    { label: t('nav.home'), href: '#home' },
+    { label: t('nav.about'), href: '#about' },
+    { label: t('nav.newStock'), href: '#new-stock' },
+    { label: t('nav.motorbikes'), href: '#motorbikes' },
+    { label: t('nav.spareParts'), href: '#spare-parts' },
+    { label: t('nav.contact'), href: '#contact' },
+  ]
 
   useEffect(() => {
     const handleScroll = () => {
@@ -86,6 +89,9 @@ export default function Navbar() {
 
             {/* Right side actions */}
             <div className="flex items-center gap-2 md:gap-3">
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+
               {/* Cart */}
               <button
                 onClick={toggleCart}
@@ -110,7 +116,7 @@ export default function Navbar() {
                 }`}
               >
                 <User className="h-4 w-4" />
-                {isLoggedIn ? 'Admin' : 'Login'}
+                {isLoggedIn ? t('nav.admin') : t('nav.login')}
               </button>
 
               {/* Mobile Menu Toggle */}
@@ -175,7 +181,7 @@ export default function Navbar() {
                     className="flex items-center gap-2 text-gray-300 hover:text-white px-4 py-3 rounded-md text-base font-medium transition-all duration-200 w-full"
                   >
                     <User className="h-5 w-5" />
-                    {isLoggedIn ? 'Admin Dashboard' : 'Admin Login'}
+                    {isLoggedIn ? t('nav.adminDashboard') : t('nav.adminLogin')}
                   </button>
                 </div>
               </div>

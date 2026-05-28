@@ -3,11 +3,13 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
+import { useTranslation } from '@/lib/i18n'
 import { getCartCheckoutMessage, getWhatsAppUrl } from '@/lib/whatsapp'
 
 export default function CartPanel() {
   const { items, isOpen, setCartOpen, removeItem, updateQuantity, getTotal, clearCart } =
     useCartStore()
+  const { t } = useTranslation()
   const total = getTotal()
 
   const handleCheckout = () => {
@@ -46,7 +48,7 @@ export default function CartPanel() {
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <div className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5 text-[#DC2626]" />
-                <h2 className="font-bold text-lg text-[#111111]">Shopping Cart</h2>
+                <h2 className="font-bold text-lg text-[#111111]">{t('cart.title')}</h2>
                 <span className="bg-[#DC2626] text-white text-xs font-bold px-2 py-0.5 rounded-full">
                   {items.length}
                 </span>
@@ -64,9 +66,9 @@ export default function CartPanel() {
               {items.length === 0 ? (
                 <div className="text-center py-16">
                   <ShoppingBag className="h-16 w-16 text-gray-200 mx-auto mb-4" />
-                  <p className="text-gray-400 text-lg">Your cart is empty</p>
+                  <p className="text-gray-400 text-lg">{t('cart.empty')}</p>
                   <p className="text-gray-300 text-sm mt-1">
-                    Start adding motorbikes or spare parts!
+                    {t('cart.emptyDesc')}
                   </p>
                 </div>
               ) : (
@@ -113,7 +115,7 @@ export default function CartPanel() {
                             onClick={() => removeItem(item.id)}
                             className="ml-auto text-gray-400 hover:text-[#DC2626] transition-colors text-xs"
                           >
-                            Remove
+                            {t('cart.remove')}
                           </button>
                         </div>
                       </div>
@@ -127,7 +129,7 @@ export default function CartPanel() {
             {items.length > 0 && (
               <div className="border-t border-gray-200 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#111111]">Total</span>
+                  <span className="font-semibold text-[#111111]">{t('cart.total')}</span>
                   <span className="text-[#DC2626] font-black text-xl">
                     TZS {total.toLocaleString()}
                   </span>
@@ -136,13 +138,13 @@ export default function CartPanel() {
                   onClick={handleCheckout}
                   className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
-                  Checkout via WhatsApp
+                  {t('cart.checkout')}
                 </button>
                 <button
                   onClick={clearCart}
                   className="w-full text-gray-500 hover:text-[#DC2626] text-sm font-medium py-2 transition-colors"
                 >
-                  Clear Cart
+                  {t('cart.clearCart')}
                 </button>
               </div>
             )}

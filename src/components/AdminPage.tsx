@@ -35,6 +35,7 @@ import {
   Check,
 } from 'lucide-react'
 import { useAdminStore } from '@/store/adminStore'
+import { useTranslation } from '@/lib/i18n'
 import { parseImages } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -71,6 +72,7 @@ type Tab = 'dashboard' | 'motorbikes' | 'spare-parts' | 'settings'
 
 export default function AdminPage() {
   const { isLoggedIn, login, logout, closeAdminPage, currentAdmin } = useAdminStore()
+  const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('dashboard')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -180,12 +182,12 @@ export default function AdminPage() {
       if (data.success) {
         login({ username: data.username, role: data.role })
         setTab('dashboard')
-        toast.success('Logged in successfully!')
+        toast.success(t('admin.loggedIn'))
       } else {
         setLoginError(data.error || 'Invalid credentials')
       }
     } catch {
-      setLoginError('Login failed. Please try again.')
+      setLoginError(t('admin.loginFailed'))
     }
   }
 
@@ -200,20 +202,20 @@ export default function AdminPage() {
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
-    toast.success('Logged out')
+    toast.success(t('admin.loggedOut'))
   }
 
   const handleCreateAdmin = async () => {
     if (!newAdminUsername.trim() || !newAdminPassword.trim()) {
-      toast.error('Username and password are required')
+      toast.error(t('admin.usernamePasswordRequired'))
       return
     }
     if (newAdminUsername.trim().length < 3) {
-      toast.error('Username must be at least 3 characters')
+      toast.error(t('admin.usernameMinLength'))
       return
     }
     if (newAdminPassword.length < 6) {
-      toast.error('Password must be at least 6 characters')
+      toast.error(t('admin.passwordMinLengthAdmin'))
       return
     }
 
@@ -231,7 +233,7 @@ export default function AdminPage() {
       })
       const data = await res.json()
       if (data.success) {
-        toast.success(`Admin "${newAdminUsername.trim()}" created successfully!`)
+        toast.success(t('admin.adminCreated', { username: newAdminUsername.trim() }))
         setNewAdminUsername('')
         setNewAdminPassword('')
         setNewAdminRole('admin')
@@ -248,7 +250,7 @@ export default function AdminPage() {
   }
 
   const handleDeleteAdmin = async (adminId: string, adminUsername: string) => {
-    if (!confirm(`Are you sure you want to delete admin "${adminUsername}"? This action cannot be undone.`)) return
+    if (!confirm(t('admin.deleteAdminConfirm', { username: adminUsername }))) return
     try {
       const res = await fetch(`/api/admin/delete?id=${adminId}`, {
         method: 'DELETE',
@@ -256,7 +258,7 @@ export default function AdminPage() {
       })
       const data = await res.json()
       if (data.success) {
-        toast.success(`Admin "${adminUsername}" deleted`)
+        toast.success(t('admin.adminDeleted', { username: adminUsername }))
         fetchAdmins()
       } else {
         toast.error(data.error || 'Failed to delete admin')
@@ -268,15 +270,15 @@ export default function AdminPage() {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      toast.error('All fields are required')
+      toast.error(t('admin.allFieldsRequired'))
       return
     }
     if (newPassword.length < 6) {
-      toast.error('New password must be at least 6 characters')
+      toast.error(t('admin.passwordMinLength'))
       return
     }
     if (newPassword !== confirmPassword) {
-      toast.error('New passwords do not match')
+      toast.error(t('admin.passwordsNoMatch'))
       return
     }
 
@@ -293,7 +295,7 @@ export default function AdminPage() {
       })
       const data = await res.json()
       if (data.success) {
-        toast.success('Password changed successfully!')
+        toast.success(t('admin.passwordChanged'))
         setCurrentPassword('')
         setNewPassword('')
         setConfirmPassword('')
@@ -396,7 +398,7 @@ export default function AdminPage() {
           credentials: 'include',
           body: JSON.stringify(payload),
         })
-        toast.success('Motorbike updated!')
+        toast.success(t('admin.motorbikeUpdated'))
       } else {
         await fetch('/api/motorbikes', {
           method: 'POST',
@@ -404,12 +406,12 @@ export default function AdminPage() {
           credentials: 'include',
           body: JSON.stringify(payload),
         })
-        toast.success('Motorbike added!')
+        toast.success(t('admin.motorbikeAdded'))
       }
       fetchMotorbikes()
       resetForm()
     } catch {
-      toast.error('Failed to save motorbike')
+      toast.error(t('admin.failedSave'))
     }
   }
 
@@ -434,7 +436,7 @@ export default function AdminPage() {
           credentials: 'include',
           body: JSON.stringify(payload),
         })
-        toast.success('Spare part updated!')
+        toast.success(t('admin.sparePartUpdated'))
       } else {
         await fetch('/api/spare-parts', {
           method: 'POST',
@@ -442,34 +444,34 @@ export default function AdminPage() {
           credentials: 'include',
           body: JSON.stringify(payload),
         })
-        toast.success('Spare part added!')
+        toast.success(t('admin.sparePartAdded'))
       }
       fetchSpareParts()
       resetForm()
     } catch {
-      toast.error('Failed to save spare part')
+      toast.error(t('admin.failedSave'))
     }
   }
 
   const handleDeleteMotorbike = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this motorbike?')) return
+    if (!confirm(t('admin.deleteConfirm'))) return
     try {
       await fetch(`/api/motorbikes/${id}`, { method: 'DELETE', credentials: 'include' })
-      toast.success('Motorbike deleted!')
+      toast.success(t('admin.motorbikeDeleted'))
       fetchMotorbikes()
     } catch {
-      toast.error('Failed to delete')
+      toast.error(t('admin.failedDelete'))
     }
   }
 
   const handleDeleteSparePart = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this spare part?')) return
+    if (!confirm(t('admin.deleteSpareConfirm'))) return
     try {
       await fetch(`/api/spare-parts/${id}`, { method: 'DELETE', credentials: 'include' })
-      toast.success('Spare part deleted!')
+      toast.success(t('admin.sparePartDeleted'))
       fetchSpareParts()
     } catch {
-      toast.error('Failed to delete')
+      toast.error(t('admin.failedDelete'))
     }
   }
 
@@ -496,9 +498,9 @@ export default function AdminPage() {
         })
         fetchSpareParts()
       }
-      toast.success('Status updated!')
+      toast.success(t('admin.statusUpdated'))
     } catch {
-      toast.error('Failed to update')
+      toast.error(t('admin.failedUpdate'))
     }
   }
 
@@ -511,9 +513,9 @@ export default function AdminPage() {
         body: JSON.stringify({ isNewStock: !current }),
       })
       fetchMotorbikes()
-      toast.success('Status updated!')
+      toast.success(t('admin.statusUpdated'))
     } catch {
-      toast.error('Failed to update')
+      toast.error(t('admin.failedUpdate'))
     }
   }
 
@@ -526,9 +528,9 @@ export default function AdminPage() {
         body: JSON.stringify({ inStock: !current }),
       })
       fetchSpareParts()
-      toast.success('Stock status updated!')
+      toast.success(t('admin.stockStatusUpdated'))
     } catch {
-      toast.error('Failed to update')
+      toast.error(t('admin.failedUpdate'))
     }
   }
 
@@ -538,7 +540,7 @@ export default function AdminPage() {
 
     // Validate size
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File too large. Maximum size is 5MB.')
+      toast.error(t('admin.imageTooLarge'))
       return
     }
 
@@ -555,12 +557,12 @@ export default function AdminPage() {
       const data = await res.json()
       if (data.success) {
         setImageList((prev) => [...prev, data.url])
-        toast.success('Image uploaded successfully!')
+        toast.success(t('admin.imageUploaded'))
       } else {
         toast.error(data.error || 'Upload failed')
       }
     } catch {
-      toast.error('Upload failed. Please try again.')
+      toast.error(t('admin.uploadFailed'))
     } finally {
       setIsUploading(false)
       // Reset file input
@@ -573,12 +575,12 @@ export default function AdminPage() {
   const handleAddImageUrl = () => {
     const url = imageUrlInput.trim()
     if (!url) {
-      toast.error('Please enter an image URL')
+      toast.error(t('admin.enterImageUrl'))
       return
     }
     setImageList((prev) => [...prev, url])
     setImageUrlInput('')
-    toast.success('Image URL added!')
+    toast.success(t('admin.imageUrlAdded'))
   }
 
   const handleRemoveImage = (index: number) => {
@@ -600,7 +602,7 @@ export default function AdminPage() {
           className="absolute top-6 left-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
-          <span className="text-sm font-medium">Back to Website</span>
+          <span className="text-sm font-medium">{t('admin.backToWebsite')}</span>
         </button>
 
         {/* Logo */}
@@ -624,9 +626,9 @@ export default function AdminPage() {
               <div className="bg-[#DC2626]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <LayoutDashboard className="h-8 w-8 text-[#DC2626]" />
               </div>
-              <h1 className="text-2xl font-black text-white">Admin Dashboard</h1>
+              <h1 className="text-2xl font-black text-white">{t('admin.dashboardTitle')}</h1>
               <p className="text-gray-500 text-sm mt-2">
-                Sign in to manage your inventory
+                {t('admin.signInSubtitle')}
               </p>
             </div>
 
@@ -639,7 +641,7 @@ export default function AdminPage() {
             <form onSubmit={handleLogin} className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-2">
-                  Username
+                  {t('admin.usernameLabel')}
                 </label>
                 <input
                   type="text"
@@ -647,12 +649,12 @@ export default function AdminPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                  placeholder="Enter username"
+                  placeholder={t('admin.enterUsername')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-2">
-                  Password
+                  {t('admin.passwordLabel')}
                 </label>
                 <input
                   type="password"
@@ -660,19 +662,19 @@ export default function AdminPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                  placeholder="Enter password"
+                  placeholder={t('admin.enterPassword')}
                 />
               </div>
               <button
                 type="submit"
                 className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold py-3.5 rounded-sm transition-all duration-300 shadow-lg shadow-[#DC2626]/20 hover:shadow-[#DC2626]/30"
               >
-                Sign In
+                {t('admin.signIn')}
               </button>
             </form>
 
             <p className="text-gray-600 text-xs text-center mt-6">
-              Moka Motors Admin Panel — Authorized access only
+              {t('admin.authorizedOnly')}
             </p>
           </div>
         </motion.div>
@@ -682,10 +684,10 @@ export default function AdminPage() {
 
   // ============ ADMIN DASHBOARD (FULL PAGE) ============
   const sidebarItems = [
-    { id: 'dashboard' as Tab, label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'motorbikes' as Tab, label: 'Motorbikes', icon: Bike },
-    { id: 'spare-parts' as Tab, label: 'Spare Parts', icon: Wrench },
-    { id: 'settings' as Tab, label: 'Settings', icon: Settings },
+    { id: 'dashboard' as Tab, label: t('admin.dashboard'), icon: LayoutDashboard },
+    { id: 'motorbikes' as Tab, label: t('admin.motorbikes'), icon: Bike },
+    { id: 'spare-parts' as Tab, label: t('admin.spareParts'), icon: Wrench },
+    { id: 'settings' as Tab, label: t('admin.settings'), icon: Settings },
   ]
 
   const totalProducts = motorbikes.length + spareParts.length
@@ -755,14 +757,14 @@ export default function AdminPage() {
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
           >
             <ArrowLeft className="h-5 w-5 shrink-0" />
-            {sidebarOpen && <span>Back to Website</span>}
+            {sidebarOpen && <span>{t('admin.backToWebsite')}</span>}
           </button>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-gray-400 hover:text-[#DC2626] hover:bg-[#DC2626]/5 transition-all"
           >
             <LogOut className="h-5 w-5 shrink-0" />
-            {sidebarOpen && <span>Logout</span>}
+            {sidebarOpen && <span>{t('admin.logout')}</span>}
           </button>
         </div>
       </aside>
@@ -773,10 +775,10 @@ export default function AdminPage() {
         <header className="h-16 bg-[#111111] border-b border-gray-800 flex items-center justify-between px-6 shrink-0">
           <div>
             <h1 className="text-white font-bold text-lg">
-              {tab === 'dashboard' && 'Dashboard'}
-              {tab === 'motorbikes' && 'Motorbikes Management'}
-              {tab === 'spare-parts' && 'Spare Parts Management'}
-              {tab === 'settings' && 'Settings'}
+              {tab === 'dashboard' && t('admin.dashboard')}
+              {tab === 'motorbikes' && t('admin.motorbikesMgmt')}
+              {tab === 'spare-parts' && t('admin.sparePartsMgmt')}
+              {tab === 'settings' && t('admin.settings')}
             </h1>
           </div>
           <div className="flex items-center gap-4">
@@ -817,10 +819,10 @@ export default function AdminPage() {
               {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { label: 'Total Products', value: totalProducts, icon: Package, color: 'bg-blue-500/10 text-blue-400' },
-                  { label: 'Featured Items', value: featuredCount, icon: Star, color: 'bg-yellow-500/10 text-yellow-400' },
-                  { label: 'New Stock', value: newStockCount, icon: TrendingUp, color: 'bg-green-500/10 text-green-400' },
-                  { label: 'Out of Stock', value: outOfStockCount, icon: Package, color: 'bg-red-500/10 text-red-400' },
+                  { label: t('admin.totalProducts'), value: totalProducts, icon: Package, color: 'bg-blue-500/10 text-blue-400' },
+                  { label: t('admin.featuredItems'), value: featuredCount, icon: Star, color: 'bg-yellow-500/10 text-yellow-400' },
+                  { label: t('admin.newStock'), value: newStockCount, icon: TrendingUp, color: 'bg-green-500/10 text-green-400' },
+                  { label: t('admin.outOfStock'), value: outOfStockCount, icon: Package, color: 'bg-red-500/10 text-red-400' },
                 ].map((stat) => (
                   <div key={stat.label} className="bg-[#1A1A1A] rounded-md border border-gray-800 p-5">
                     <div className="flex items-center justify-between mb-3">
@@ -837,7 +839,7 @@ export default function AdminPage() {
               {/* Quick Actions */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6">
-                  <h3 className="text-white font-bold text-lg mb-4">Quick Actions</h3>
+                  <h3 className="text-white font-bold text-lg mb-4">{t('admin.quickActions')}</h3>
                   <div className="space-y-3">
                     <button
                       onClick={() => { setTab('motorbikes'); setIsAdding(true); setShowForm(true); setImageList([]); setImageUrlInput('') }}
@@ -847,8 +849,8 @@ export default function AdminPage() {
                         <Bike className="h-5 w-5 text-[#DC2626]" />
                       </div>
                       <div>
-                        <p className="text-white text-sm font-semibold">Add New Motorbike</p>
-                        <p className="text-gray-500 text-xs">Add a motorbike to the inventory</p>
+                        <p className="text-white text-sm font-semibold">{t('admin.addNewMotorbike')}</p>
+                        <p className="text-gray-500 text-xs">{t('admin.addNewMotorbikeDesc')}</p>
                       </div>
                       <ChevronRight className="h-4 w-4 text-gray-600 ml-auto" />
                     </button>
@@ -860,8 +862,8 @@ export default function AdminPage() {
                         <Wrench className="h-5 w-5 text-[#DC2626]" />
                       </div>
                       <div>
-                        <p className="text-white text-sm font-semibold">Add New Spare Part</p>
-                        <p className="text-gray-500 text-xs">Add a spare part to the inventory</p>
+                        <p className="text-white text-sm font-semibold">{t('admin.addNewSparePart')}</p>
+                        <p className="text-gray-500 text-xs">{t('admin.addNewSparePartDesc')}</p>
                       </div>
                       <ChevronRight className="h-4 w-4 text-gray-600 ml-auto" />
                     </button>
@@ -870,7 +872,7 @@ export default function AdminPage() {
 
                 {/* Recent Activity */}
                 <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6">
-                  <h3 className="text-white font-bold text-lg mb-4">Inventory Overview</h3>
+                  <h3 className="text-white font-bold text-lg mb-4">{t('admin.inventoryOverview')}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-gray-400 text-sm">Motorbikes</span>
@@ -914,7 +916,7 @@ export default function AdminPage() {
 
               {/* Brand Distribution */}
               <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6">
-                <h3 className="text-white font-bold text-lg mb-4">Brand Distribution</h3>
+                <h3 className="text-white font-bold text-lg mb-4">{t('admin.brandDistribution')}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {['Honda', 'Kawasaki', 'KTM', 'Yamaha'].map((brand) => {
                     const bikeCount = motorbikes.filter(b => b.brand === brand).length
@@ -922,7 +924,7 @@ export default function AdminPage() {
                     return (
                       <div key={brand} className="bg-[#111111] rounded-md p-4 border border-gray-800">
                         <p className="text-white font-bold text-sm">{brand}</p>
-                        <p className="text-gray-500 text-xs mt-1">{bikeCount} bikes, {partCount} parts</p>
+                        <p className="text-gray-500 text-xs mt-1">{bikeCount} {t('admin.bikes')}, {partCount} {t('admin.partsLabel')}</p>
                         <div className="mt-3 h-1.5 bg-gray-800 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-[#DC2626] rounded-full"
@@ -955,7 +957,7 @@ export default function AdminPage() {
                   className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-5 py-2.5 rounded-md flex items-center gap-2 transition-colors shadow-lg shadow-[#DC2626]/20"
                 >
                   <Plus className="h-4 w-4" />
-                  Add Motorbike
+                  {t('admin.addMotorbike')}
                 </button>
               </div>
 
@@ -965,12 +967,12 @@ export default function AdminPage() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-800">
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Product</th>
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Brand</th>
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Category</th>
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Price</th>
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Status</th>
-                        <th className="text-right text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Actions</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.product')}</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.brand')}</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.category')}</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.price')}</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.status')}</th>
+                        <th className="text-right text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1058,7 +1060,7 @@ export default function AdminPage() {
                         <tr>
                           <td colSpan={6} className="px-5 py-16 text-center">
                             <Bike className="h-12 w-12 text-gray-700 mx-auto mb-3" />
-                            <p className="text-gray-500">No motorbikes found</p>
+                            <p className="text-gray-500">{t('admin.noMotorbikes')}</p>
                           </td>
                         </tr>
                       )}
@@ -1087,7 +1089,7 @@ export default function AdminPage() {
                   className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-5 py-2.5 rounded-md flex items-center gap-2 transition-colors shadow-lg shadow-[#DC2626]/20"
                 >
                   <Plus className="h-4 w-4" />
-                  Add Spare Part
+                  {t('admin.addSparePart')}
                 </button>
               </div>
 
@@ -1097,12 +1099,12 @@ export default function AdminPage() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-800">
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Product</th>
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Brand</th>
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Type</th>
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Price</th>
-                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Status</th>
-                        <th className="text-right text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">Actions</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.product')}</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.brand')}</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.type')}</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.price')}</th>
+                        <th className="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.status')}</th>
+                        <th className="text-right text-xs font-bold text-gray-500 uppercase tracking-wider px-5 py-3">{t('admin.actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1192,7 +1194,7 @@ export default function AdminPage() {
                         <tr>
                           <td colSpan={6} className="px-5 py-16 text-center">
                             <Wrench className="h-12 w-12 text-gray-700 mx-auto mb-3" />
-                            <p className="text-gray-500">No spare parts found</p>
+                            <p className="text-gray-500">{t('admin.noSpareParts')}</p>
                           </td>
                         </tr>
                       )}
@@ -1219,8 +1221,8 @@ export default function AdminPage() {
                 <h3 className="text-white font-bold text-xl mb-6">
                   {isAdding
                     ? tab === 'motorbikes'
-                      ? 'Add New Motorbike'
-                      : 'Add New Spare Part'
+                      ? t('admin.addNewMotorbike')
+                      : t('admin.addNewSparePart')
                     : 'Edit Item'}
                 </h3>
                 <div className="space-y-5">
@@ -1476,7 +1478,7 @@ export default function AdminPage() {
                       onClick={resetForm}
                       className="flex-1 bg-[#1A1A1A] hover:bg-[#222222] text-gray-300 font-bold py-3.5 rounded-md transition-colors border border-gray-700"
                     >
-                      Cancel
+                      {t('admin.cancel')}
                     </button>
                   </div>
                 </div>
@@ -1491,11 +1493,11 @@ export default function AdminPage() {
               <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
                 <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
                   <Shield className="h-5 w-5 text-[#DC2626]" />
-                  Account Information
+                  {t('admin.accountInfo')}
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">Username</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.usernameLabel')}</label>
                     <input
                       type="text"
                       value={currentAdmin?.username || 'admin'}
@@ -1504,11 +1506,11 @@ export default function AdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">Role</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.role')}</label>
                     <div className="flex items-center gap-3">
                       <input
                         type="text"
-                        value={currentAdmin?.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                        value={currentAdmin?.role === 'super_admin' ? t('admin.superAdmin') : t('admin.adminRole')}
                         readOnly
                         className="flex-1 px-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-gray-500 cursor-not-allowed"
                       />
@@ -1517,7 +1519,7 @@ export default function AdminPage() {
                           ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
                           : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
                       }`}>
-                        {currentAdmin?.role === 'super_admin' ? 'Full Access' : 'Standard'}
+                        {currentAdmin?.role === 'super_admin' ? t('admin.fullAccess') : t('admin.standard')}
                       </span>
                     </div>
                   </div>
@@ -1528,18 +1530,18 @@ export default function AdminPage() {
               <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
                 <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
                   <KeyRound className="h-5 w-5 text-[#DC2626]" />
-                  Change Password
+                  {t('admin.changePassword')}
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">Current Password</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.currentPassword')}</label>
                     <div className="relative">
                       <input
                         type={showCurrentPassword ? 'text' : 'password'}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         className="w-full px-4 py-3 pr-12 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                        placeholder="Enter current password"
+                        placeholder={t('admin.enterCurrentPassword')}
                       />
                       <button
                         type="button"
@@ -1551,14 +1553,14 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">New Password</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.newPassword')}</label>
                     <div className="relative">
                       <input
                         type={showNewPassword ? 'text' : 'password'}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         className="w-full px-4 py-3 pr-12 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                        placeholder="Enter new password (min 6 characters)"
+                        placeholder={t('admin.enterNewPassword')}
                       />
                       <button
                         type="button"
@@ -1570,13 +1572,13 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">Confirm New Password</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.confirmNewPassword')}</label>
                     <input
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                      placeholder="Confirm new password"
+                      placeholder={t('admin.confirmPasswordPlaceholder')}
                     />
                   </div>
                   <button
@@ -1589,7 +1591,7 @@ export default function AdminPage() {
                     ) : (
                       <Check className="h-4 w-4" />
                     )}
-                    {isChangingPassword ? 'Changing...' : 'Change Password'}
+                    {isChangingPassword ? t('admin.changing') : t('admin.changePasswordBtn')}
                   </button>
                 </div>
               </div>
@@ -1600,14 +1602,14 @@ export default function AdminPage() {
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-white font-bold text-lg flex items-center gap-2">
                       <Users className="h-5 w-5 text-[#DC2626]" />
-                      Manage Admins
+                      {t('admin.manageAdmins')}
                     </h3>
                     <button
                       onClick={() => setShowNewAdminForm(!showNewAdminForm)}
                       className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
                     >
                       <UserPlus className="h-4 w-4" />
-                      Add Admin
+                      {t('admin.addAdmin')}
                     </button>
                   </div>
 
@@ -1616,32 +1618,32 @@ export default function AdminPage() {
                     <div className="bg-[#111111] rounded-md border border-gray-700 p-5 mb-6 space-y-4">
                       <h4 className="text-white font-semibold text-sm flex items-center gap-2">
                         <PlusCircle className="h-4 w-4 text-[#DC2626]" />
-                        Create New Admin
+                        {t('admin.createNewAdmin')}
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-300 mb-2">Username</label>
+                          <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.usernameLabel')}</label>
                           <input
                             type="text"
                             value={newAdminUsername}
                             onChange={(e) => setNewAdminUsername(e.target.value)}
                             className="w-full px-4 py-3 bg-[#0F0F0F] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                            placeholder="Min 3 characters"
+                            placeholder={t('admin.usernameMin')}
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
+                          <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.passwordLabel')}</label>
                           <input
                             type="password"
                             value={newAdminPassword}
                             onChange={(e) => setNewAdminPassword(e.target.value)}
                             className="w-full px-4 py-3 bg-[#0F0F0F] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                            placeholder="Min 6 characters"
+                            placeholder={t('admin.passwordMin')}
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">Role</label>
+                        <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.role')}</label>
                         <div className="flex gap-4">
                           <label className="flex items-center gap-2 cursor-pointer">
                             <input
@@ -1652,8 +1654,8 @@ export default function AdminPage() {
                               onChange={(e) => setNewAdminRole(e.target.value)}
                               className="accent-[#DC2626]"
                             />
-                            <span className="text-gray-300 text-sm">Admin</span>
-                            <span className="text-gray-600 text-xs">(Can add/edit motorbikes & spare parts)</span>
+                            <span className="text-gray-300 text-sm">{t('admin.adminRoleLabel')}</span>
+                            <span className="text-gray-600 text-xs">{t('admin.adminRoleDesc')}</span>
                           </label>
                           <label className="flex items-center gap-2 cursor-pointer">
                             <input
@@ -1664,8 +1666,8 @@ export default function AdminPage() {
                               onChange={(e) => setNewAdminRole(e.target.value)}
                               className="accent-[#DC2626]"
                             />
-                            <span className="text-gray-300 text-sm">Super Admin</span>
-                            <span className="text-gray-600 text-xs">(Full access + manage admins)</span>
+                            <span className="text-gray-300 text-sm">{t('admin.superAdminRoleLabel')}</span>
+                            <span className="text-gray-600 text-xs">{t('admin.superAdminRoleDesc')}</span>
                           </label>
                         </div>
                       </div>
@@ -1680,7 +1682,7 @@ export default function AdminPage() {
                           ) : (
                             <Plus className="h-4 w-4" />
                           )}
-                          {isCreatingAdmin ? 'Creating...' : 'Create Admin'}
+                          {isCreatingAdmin ? t('admin.creating') : t('admin.createAdmin')}
                         </button>
                         <button
                           onClick={() => {
@@ -1691,7 +1693,7 @@ export default function AdminPage() {
                           }}
                           className="bg-gray-700 hover:bg-gray-600 text-white font-medium px-5 py-2.5 rounded-md transition-colors text-sm"
                         >
-                          Cancel
+                          {t('admin.cancel')}
                         </button>
                       </div>
                     </div>
@@ -1720,7 +1722,7 @@ export default function AdminPage() {
                             <div className="flex items-center gap-2">
                               <p className="text-white font-semibold text-sm">{admin.username}</p>
                               {admin.username === currentAdmin?.username && (
-                                <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded font-semibold">You</span>
+                                <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded font-semibold">{t('admin.you')}</span>
                               )}
                             </div>
                             <div className="flex items-center gap-2 mt-0.5">
@@ -1729,10 +1731,10 @@ export default function AdminPage() {
                                   ? 'bg-yellow-500/10 text-yellow-400'
                                   : 'bg-blue-500/10 text-blue-400'
                               }`}>
-                                {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                                {admin.role === 'super_admin' ? t('admin.superAdmin') : t('admin.adminRole')}
                               </span>
                               <span className="text-gray-600 text-xs">
-                                Created {new Date(admin.createdAt).toLocaleDateString()}
+                                {t('admin.created')} {new Date(admin.createdAt).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
@@ -1741,7 +1743,7 @@ export default function AdminPage() {
                           <button
                             onClick={() => handleDeleteAdmin(admin.id, admin.username)}
                             className="p-2 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors"
-                            title="Delete Admin"
+                            title={t('admin.deleteAdmin')}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -1751,7 +1753,7 @@ export default function AdminPage() {
                     {admins.length === 0 && (
                       <div className="text-center py-8">
                         <Users className="h-10 w-10 text-gray-700 mx-auto mb-2" />
-                        <p className="text-gray-500 text-sm">No admins found</p>
+                        <p className="text-gray-500 text-sm">{t('admin.noAdmins')}</p>
                       </div>
                     )}
                   </div>
@@ -1760,10 +1762,10 @@ export default function AdminPage() {
 
               {/* Store Information */}
               <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
-                <h3 className="text-white font-bold text-lg mb-6">Store Information</h3>
+                <h3 className="text-white font-bold text-lg mb-6">{t('admin.storeInfo')}</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">Store Name</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.storeName')}</label>
                     <input
                       type="text"
                       value="Moka Motors"
@@ -1772,7 +1774,7 @@ export default function AdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">WhatsApp Number</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.whatsappNumber')}</label>
                     <input
                       type="text"
                       value="+255 625 260000"
@@ -1781,7 +1783,7 @@ export default function AdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">Location</label>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.locationLabel')}</label>
                     <input
                       type="text"
                       value="Kariakoo, Dar es Salaam, Tanzania"
@@ -1794,16 +1796,16 @@ export default function AdminPage() {
 
               {/* Danger Zone */}
               <div className="bg-red-500/5 rounded-md border border-red-500/20 p-6">
-                <h3 className="text-red-400 font-bold text-lg mb-2">Danger Zone</h3>
+                <h3 className="text-red-400 font-bold text-lg mb-2">{t('admin.dangerZone')}</h3>
                 <p className="text-gray-400 text-sm mb-4">
-                  Logging out will end your admin session and you will need to sign in again.
+                  {t('admin.dangerDesc')}
                 </p>
                 <button
                   onClick={handleLogout}
                   className="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold px-6 py-2.5 rounded-md transition-colors border border-red-500/20 flex items-center gap-2"
                 >
                   <LogOut className="h-4 w-4" />
-                  Logout
+                  {t('admin.logout')}
                 </button>
               </div>
             </div>

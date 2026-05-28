@@ -2,8 +2,10 @@
 
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 export default function HeroSection() {
+  const { t } = useTranslation()
   const scrollToInventory = () => {
     document.querySelector('#motorbikes')?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -41,13 +43,13 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-[0.95] mb-6"
           >
-            <span className="block">PREMIUM</span>
-            <span className="block text-[#DC2626]">MOTORBIKES</span>
+            <span className="block">{t('hero.premium')}</span>
+            <span className="block text-[#DC2626]">{t('hero.motorbikes')}</span>
             <span className="block text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white/90 mt-2">
-              & SPARE PARTS
+              {t('hero.spareParts')}
             </span>
             <span className="block text-lg md:text-xl lg:text-2xl text-gray-400 font-normal mt-4 tracking-wide">
-              IN DAR ES SALAAM, TANZANIA
+              {t('hero.location')}
             </span>
           </motion.h1>
 
@@ -57,9 +59,7 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-gray-300 text-base md:text-lg max-w-xl mb-10 leading-relaxed"
           >
-            Your trusted destination for premium motorbikes and genuine spare parts.
-            Located in Kariakoo, Dar es Salaam — we bring you the best rides at
-            unbeatable prices.
+            {t('hero.description')}
           </motion.p>
 
           <motion.div
@@ -72,14 +72,14 @@ export default function HeroSection() {
               onClick={scrollToInventory}
               className="bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold px-8 py-4 rounded-sm text-base transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg shadow-[#DC2626]/25 hover:shadow-[#DC2626]/40 hover:-translate-y-0.5"
             >
-              EXPLORE INVENTORY
+              {t('hero.exploreInventory')}
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
               onClick={scrollToContact}
               className="border-2 border-white/30 text-white hover:bg-white hover:text-[#111111] font-bold px-8 py-4 rounded-sm text-base transition-all duration-300 backdrop-blur-sm"
             >
-              CONTACT US
+              {t('hero.contactUs')}
             </button>
           </motion.div>
 
@@ -92,17 +92,17 @@ export default function HeroSection() {
           >
             <div>
               <p className="text-3xl font-black text-white">10+</p>
-              <p className="text-gray-400 text-sm mt-1">Motorbikes</p>
+              <p className="text-gray-400 text-sm mt-1">{t('hero.statsMotorbikes')}</p>
             </div>
             <div className="w-px h-12 bg-white/10" />
             <div>
               <p className="text-3xl font-black text-white">100+</p>
-              <p className="text-gray-400 text-sm mt-1">Spare Parts</p>
+              <p className="text-gray-400 text-sm mt-1">{t('hero.statsSpareParts')}</p>
             </div>
             <div className="w-px h-12 bg-white/10" />
             <div>
               <p className="text-3xl font-black text-white">4</p>
-              <p className="text-gray-400 text-sm mt-1">Top Brands</p>
+              <p className="text-gray-400 text-sm mt-1">{t('hero.statsTopBrands')}</p>
             </div>
           </motion.div>
         </div>
