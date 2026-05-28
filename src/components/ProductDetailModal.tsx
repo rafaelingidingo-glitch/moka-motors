@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -76,6 +76,11 @@ export default function ProductDetailModal({
   const { toggleLike, isLiked } = useLikeStore()
   const { t } = useTranslation()
   const [currentImage, setCurrentImage] = useState(0)
+
+  // Reset image index when product changes
+  useEffect(() => {
+    setCurrentImage(0)
+  }, [product?.id])
 
   if (!product) return null
 

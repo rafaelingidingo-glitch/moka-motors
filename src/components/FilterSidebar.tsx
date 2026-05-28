@@ -106,7 +106,10 @@ export default function FilterSidebar({
 
   const handleApply = () => {
     onFilterChange(pendingFilters)
-    onToggle() // Close mobile overlay
+    // Only close overlay on mobile (where the overlay is visible)
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      onToggle()
+    }
   }
 
   const handleClear = () => {

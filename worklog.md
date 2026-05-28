@@ -145,3 +145,46 @@ Stage Summary:
 - 2 version/dependency bugs fixed (dnd-kit, unused deps)
 - 7 fetch error handling bugs fixed
 - Dependencies cleaned up (removed next-auth, next-intl)
+
+---
+Task ID: 5
+Agent: Main Agent
+Task: Second thorough code review — find and fix remaining bugs, verify dependency versions
+
+Work Log:
+- Re-read all 20+ source files (components, API routes, stores, utils, layout)
+- Checked installed dependency versions against latest stable
+- Ran TypeScript type checker (tsc --noEmit) — zero errors
+- Ran Next.js build — compiled successfully
+- Verified all core deps are on latest stable versions
+
+FIXES APPLIED:
+
+1. **Bug: ProductDetailModal `currentImage` not reset on product change**
+   - When switching from product A (viewing image #3) to product B, the modal stayed on image #3 which may not exist for product B
+   - Added `useEffect(() => { setCurrentImage(0) }, [product?.id])` to reset on product switch
+
+2. **Bug: API fetch calls don't check `res.ok` before `res.json()`**
+   - `MotorbikeInventory.tsx`: fetch('/api/motorbikes') now checks res.ok
+   - `SparePartsInventory.tsx`: fetch('/api/spare-parts') now checks res.ok
+   - Without this check, error responses would be parsed as JSON data and set as the state
+
+3. **Bug: FilterSidebar `handleApply` calls `onToggle()` on desktop**
+   - Clicking "Apply Filter" on desktop was toggling the mobile overlay state unnecessarily
+   - Changed to only call `onToggle()` when `window.innerWidth < 1024` (mobile)
+
+4. **Cleanup: Removed unused imports in AdminPage.tsx**
+   - Removed `BarChart3` (imported but never used in JSX)
+   - Removed `ShoppingCart` (imported but never used in JSX)
+
+DEPENDENCY VERSION STATUS:
+All core dependencies verified on latest stable versions:
+- Next.js 16.2.6, React 19.2.6, Prisma 6.19.3, Zustand 5.0.14
+- Framer Motion 12.40.0, Tailwind CSS 4.3.0, Zod 4.4.3, Sonner 2.0.7
+- Lucide React 0.525.0, Sharp 0.34.5, TypeScript 5.9.3
+All compatible with each other and with the codebase.
+
+Stage Summary:
+- Build succeeds, zero TS errors, zero lint errors
+- 4 bugs fixed (modal image reset, API error handling, desktop filter toggle, unused imports)
+- All dependencies on latest stable and compatible

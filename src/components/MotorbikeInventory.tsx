@@ -51,7 +51,10 @@ export default function MotorbikeInventory() {
 
   useEffect(() => {
     fetch('/api/motorbikes')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch')
+        return res.json()
+      })
       .then((data) => setBikes(data))
       .catch(console.error)
   }, [])

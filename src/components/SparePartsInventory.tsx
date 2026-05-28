@@ -80,7 +80,10 @@ export default function SparePartsInventory() {
 
   useEffect(() => {
     fetch('/api/spare-parts')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch')
+        return res.json()
+      })
       .then((data) => setParts(data))
       .catch(console.error)
   }, [])
