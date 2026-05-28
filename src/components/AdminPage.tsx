@@ -600,18 +600,18 @@ export default function AdminPage() {
         {/* Back button */}
         <button
           onClick={closeAdminPage}
-          className="absolute top-6 left-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+          className="absolute top-4 left-4 md:top-6 md:left-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors z-10"
         >
           <ArrowLeft className="h-5 w-5" />
-          <span className="text-sm font-medium">{t('admin.backToWebsite')}</span>
+          <span className="text-sm font-medium hidden sm:inline">{t('admin.backToWebsite')}</span>
         </button>
 
         {/* Logo */}
-        <div className="absolute top-6 right-6">
+        <div className="absolute top-4 right-4 md:top-6 md:right-6">
           <img
             src="/images/logo.jpg"
             alt="Moka Motors Logo"
-            className="h-10 w-auto object-contain rounded-sm"
+            className="h-8 md:h-10 w-auto object-contain rounded-sm"
           />
         </div>
 
@@ -621,7 +621,7 @@ export default function AdminPage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-md px-6"
         >
-          <div className="bg-[#1A1A1A] rounded-sm border border-gray-800 p-8 md:p-10 shadow-2xl">
+          <div className="bg-[#1A1A1A] rounded-sm border border-gray-800 p-6 sm:p-8 md:p-10 shadow-2xl">
             {/* Login Header */}
             <div className="text-center mb-8">
               <div className="bg-[#DC2626]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -819,7 +819,7 @@ export default function AdminPage() {
                   placeholder={t('admin.search') || 'Search...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-[#1A1A1A] border border-gray-700 rounded-md pl-10 pr-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#DC2626] transition-colors w-32 sm:w-48 md:w-64"
+                  className="bg-[#1A1A1A] border border-gray-700 rounded-md pl-10 pr-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#DC2626] transition-colors w-28 sm:w-48 md:w-64"
                 />
               </div>
             )}
@@ -837,26 +837,26 @@ export default function AdminPage() {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-3 md:p-6">
+        <div className="flex-1 overflow-y-auto p-3 md:p-6 pb-20 md:pb-6">
           {/* ===== DASHBOARD TAB ===== */}
           {tab === 'dashboard' && (
             <div className="space-y-6">
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                 {[
                   { label: t('admin.totalProducts'), value: totalProducts, icon: Package, color: 'bg-blue-500/10 text-blue-400' },
                   { label: t('admin.featuredItems'), value: featuredCount, icon: Star, color: 'bg-yellow-500/10 text-yellow-400' },
                   { label: t('admin.newStock'), value: newStockCount, icon: TrendingUp, color: 'bg-green-500/10 text-green-400' },
                   { label: t('admin.outOfStock'), value: outOfStockCount, icon: Package, color: 'bg-red-500/10 text-red-400' },
                 ].map((stat) => (
-                  <div key={stat.label} className="bg-[#1A1A1A] rounded-md border border-gray-800 p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider">{stat.label}</p>
-                      <div className={`p-2 rounded-md ${stat.color}`}>
-                        <stat.icon className="h-4 w-4" />
+                  <div key={stat.label} className="bg-[#1A1A1A] rounded-md border border-gray-800 p-3 md:p-5">
+                    <div className="flex items-center justify-between mb-2 md:mb-3">
+                      <p className="text-gray-500 text-[10px] md:text-xs font-semibold uppercase tracking-wider">{stat.label}</p>
+                      <div className={`p-1.5 md:p-2 rounded-md ${stat.color}`}>
+                        <stat.icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
                       </div>
                     </div>
-                    <p className="text-3xl font-black text-white">{stat.value}</p>
+                    <p className="text-2xl md:text-3xl font-black text-white">{stat.value}</p>
                   </div>
                 ))}
               </div>
@@ -870,27 +870,27 @@ export default function AdminPage() {
                       onClick={() => { setTab('motorbikes'); setIsAdding(true); setShowForm(true); setImageList([]); setImageUrlInput('') }}
                       className="w-full flex items-center gap-3 bg-[#111111] hover:bg-[#DC2626]/10 border border-gray-700 hover:border-[#DC2626]/30 rounded-md p-3 transition-all text-left group"
                     >
-                      <div className="bg-[#DC2626]/10 group-hover:bg-[#DC2626]/20 p-2 rounded-md transition-colors">
+                      <div className="bg-[#DC2626]/10 group-hover:bg-[#DC2626]/20 p-2 rounded-md transition-colors shrink-0">
                         <Bike className="h-5 w-5 text-[#DC2626]" />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-white text-sm font-semibold">{t('admin.addNewMotorbike')}</p>
-                        <p className="text-gray-500 text-xs">{t('admin.addNewMotorbikeDesc')}</p>
+                        <p className="text-gray-500 text-xs truncate">{t('admin.addNewMotorbikeDesc')}</p>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-gray-600 ml-auto" />
+                      <ChevronRight className="h-4 w-4 text-gray-600 ml-auto shrink-0" />
                     </button>
                     <button
                       onClick={() => { setTab('spare-parts'); setIsAdding(true); setShowForm(true); setImageList([]); setImageUrlInput('') }}
                       className="w-full flex items-center gap-3 bg-[#111111] hover:bg-[#DC2626]/10 border border-gray-700 hover:border-[#DC2626]/30 rounded-md p-3 transition-all text-left group"
                     >
-                      <div className="bg-[#DC2626]/10 group-hover:bg-[#DC2626]/20 p-2 rounded-md transition-colors">
+                      <div className="bg-[#DC2626]/10 group-hover:bg-[#DC2626]/20 p-2 rounded-md transition-colors shrink-0">
                         <Wrench className="h-5 w-5 text-[#DC2626]" />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-white text-sm font-semibold">{t('admin.addNewSparePart')}</p>
-                        <p className="text-gray-500 text-xs">{t('admin.addNewSparePartDesc')}</p>
+                        <p className="text-gray-500 text-xs truncate">{t('admin.addNewSparePartDesc')}</p>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-gray-600 ml-auto" />
+                      <ChevronRight className="h-4 w-4 text-gray-600 ml-auto shrink-0" />
                     </button>
                   </div>
                 </div>
@@ -940,14 +940,14 @@ export default function AdminPage() {
               </div>
 
               {/* Brand Distribution */}
-              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6">
+              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-4 md:p-6">
                 <h3 className="text-white font-bold text-lg mb-4">{t('admin.brandDistribution')}</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                   {['Honda', 'Kawasaki', 'KTM', 'Yamaha'].map((brand) => {
                     const bikeCount = motorbikes.filter(b => b.brand === brand).length
                     const partCount = spareParts.filter(p => p.brand === brand).length
                     return (
-                      <div key={brand} className="bg-[#111111] rounded-md p-4 border border-gray-800">
+                      <div key={brand} className="bg-[#111111] rounded-md p-3 md:p-4 border border-gray-800">
                         <p className="text-white font-bold text-sm">{brand}</p>
                         <p className="text-gray-500 text-xs mt-1">{bikeCount} {t('admin.bikes')}, {partCount} {t('admin.partsLabel')}</p>
                         <div className="mt-3 h-1.5 bg-gray-800 rounded-full overflow-hidden">
@@ -985,8 +985,90 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              {/* Table */}
-              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 overflow-hidden">
+              {/* Mobile Card Layout */}
+              <div className="md:hidden space-y-3">
+                {filteredMotorbikes.map((bike) => {
+                  const bikeImages = parseImages(bike.images)
+                  const firstImage = bikeImages.length > 0 ? bikeImages[0] : ''
+                  return (
+                    <div key={bike.id} className="bg-[#1A1A1A] rounded-md border border-gray-800 p-3">
+                      <div className="flex gap-3">
+                        {firstImage ? (
+                          <img
+                            src={firstImage}
+                            alt={bike.name}
+                            className="w-16 h-16 object-cover rounded-md shrink-0 bg-[#111111]"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 bg-[#111111] rounded-md shrink-0 flex items-center justify-center">
+                            <ImageIcon className="h-6 w-6 text-gray-600" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white text-sm font-semibold truncate">{bike.name}</p>
+                          <p className="text-gray-500 text-xs mt-0.5">{bike.brand} • {bike.category}</p>
+                          <p className="text-gray-500 text-xs">{bike.year} • {bike.engineSize}</p>
+                          <p className="text-[#DC2626] font-bold text-sm mt-1">TZS {bike.price.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-800/50">
+                        <div className="flex gap-1.5">
+                          {bike.featured && (
+                            <span className="text-[10px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded font-semibold">Featured</span>
+                          )}
+                          {bike.isNewStock && (
+                            <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded font-semibold">New</span>
+                          )}
+                          {!bike.featured && !bike.isNewStock && (
+                            <span className="text-[10px] text-gray-600">—</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleToggleFeatured(bike.id, 'motorbike', bike.featured)}
+                            className={`p-2 rounded transition-colors ${
+                              bike.featured ? 'text-yellow-400 hover:bg-yellow-500/10' : 'text-gray-600 hover:bg-white/5'
+                            }`}
+                            title="Toggle Featured"
+                          >
+                            <Star className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleToggleNewStock(bike.id, bike.isNewStock)}
+                            className={`p-2 rounded transition-colors text-xs font-bold ${
+                              bike.isNewStock ? 'text-green-400 hover:bg-green-500/10' : 'text-gray-600 hover:bg-white/5'
+                            }`}
+                            title="Toggle New Stock"
+                          >
+                            NEW
+                          </button>
+                          <button
+                            onClick={() => handleEditMotorbike(bike)}
+                            className="p-2 text-gray-600 hover:text-blue-400 hover:bg-blue-500/10 rounded transition-colors"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteMotorbike(bike.id)}
+                            className="p-2 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+                {filteredMotorbikes.length === 0 && (
+                  <div className="text-center py-12">
+                    <Bike className="h-12 w-12 text-gray-700 mx-auto mb-3" />
+                    <p className="text-gray-500">{t('admin.noMotorbikes')}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table Layout */}
+              <div className="hidden md:block bg-[#1A1A1A] rounded-md border border-gray-800 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -1116,8 +1198,89 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              {/* Table */}
-              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 overflow-hidden">
+              {/* Mobile Card Layout */}
+              <div className="md:hidden space-y-3">
+                {filteredSpareParts.map((part) => {
+                  const partImages = parseImages(part.images)
+                  const firstImage = partImages.length > 0 ? partImages[0] : ''
+                  return (
+                    <div key={part.id} className="bg-[#1A1A1A] rounded-md border border-gray-800 p-3">
+                      <div className="flex gap-3">
+                        {firstImage ? (
+                          <img
+                            src={firstImage}
+                            alt={part.name}
+                            className="w-16 h-16 object-cover rounded-md shrink-0 bg-[#111111]"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 bg-[#111111] rounded-md shrink-0 flex items-center justify-center">
+                            <ImageIcon className="h-6 w-6 text-gray-600" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white text-sm font-semibold truncate">{part.name}</p>
+                          <p className="text-gray-500 text-xs mt-0.5">{part.brand} • {part.type}</p>
+                          <p className="text-gray-500 text-xs truncate">{part.compatibility}</p>
+                          <p className="text-[#DC2626] font-bold text-sm mt-1">TZS {part.price.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-800/50">
+                        <div className="flex gap-1.5">
+                          {part.featured && (
+                            <span className="text-[10px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded font-semibold">Featured</span>
+                          )}
+                          <span className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
+                            part.inStock ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                          }`}>
+                            {part.inStock ? 'In Stock' : 'Out'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleToggleFeatured(part.id, 'spare-part', part.featured)}
+                            className={`p-2 rounded transition-colors ${
+                              part.featured ? 'text-yellow-400 hover:bg-yellow-500/10' : 'text-gray-600 hover:bg-white/5'
+                            }`}
+                            title="Toggle Featured"
+                          >
+                            <Star className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleToggleInStock(part.id, part.inStock)}
+                            className={`p-2 rounded transition-colors text-xs font-bold ${
+                              part.inStock ? 'text-green-400 hover:bg-green-500/10' : 'text-red-400 hover:bg-red-500/10'
+                            }`}
+                            title="Toggle Stock"
+                          >
+                            {part.inStock ? '✓' : '✗'}
+                          </button>
+                          <button
+                            onClick={() => handleEditSparePart(part)}
+                            className="p-2 text-gray-600 hover:text-blue-400 hover:bg-blue-500/10 rounded transition-colors"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSparePart(part.id)}
+                            className="p-2 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+                {filteredSpareParts.length === 0 && (
+                  <div className="text-center py-12">
+                    <Wrench className="h-12 w-12 text-gray-700 mx-auto mb-3" />
+                    <p className="text-gray-500">{t('admin.noSpareParts')}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table Layout */}
+              <div className="hidden md:block bg-[#1A1A1A] rounded-md border border-gray-800 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -1230,7 +1393,7 @@ export default function AdminPage() {
 
           {/* ===== FORM (Add/Edit) ===== */}
           {showForm && (tab === 'motorbikes' || tab === 'spare-parts') && (
-            <div className="max-w-2xl">
+            <div className="w-full max-w-2xl">
               <div className="mb-4 md:mb-6">
                 <button
                   onClick={resetForm}
@@ -1389,13 +1552,13 @@ export default function AdminPage() {
 
                     {/* Image Gallery */}
                     {imageList.length > 0 && (
-                      <div className="flex flex-wrap gap-3 mb-4">
+                      <div className="flex flex-wrap gap-2 sm:gap-3 mb-4">
                         {imageList.map((img, index) => (
                           <div key={index} className="relative group">
                             <img
                               src={img}
                               alt={`Product image ${index + 1}`}
-                              className="w-20 h-20 object-cover rounded-md border border-gray-700 bg-[#111111]"
+                              className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-gray-700 bg-[#111111]"
                             />
                             <button
                               type="button"
@@ -1458,7 +1621,7 @@ export default function AdminPage() {
 
                       {/* URL Input */}
                       <div className="flex gap-2">
-                        <div className="relative flex-1">
+                        <div className="relative flex-1 min-w-0">
                           <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                           <input
                             type="text"
@@ -1470,17 +1633,17 @@ export default function AdminPage() {
                                 handleAddImageUrl()
                               }
                             }}
-                            className="w-full pl-10 pr-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                            placeholder="https://example.com/image.png"
+                            className="w-full pl-10 pr-3 py-3 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all text-sm"
+                            placeholder="Image URL..."
                           />
                         </div>
                         <button
                           type="button"
                           onClick={handleAddImageUrl}
-                          className="bg-[#111111] hover:bg-[#DC2626]/10 border border-gray-700 hover:border-[#DC2626]/30 text-gray-300 hover:text-white px-4 rounded-md transition-all flex items-center gap-1.5 text-sm font-semibold shrink-0"
+                          className="bg-[#111111] hover:bg-[#DC2626]/10 border border-gray-700 hover:border-[#DC2626]/30 text-gray-300 hover:text-white px-3 sm:px-4 rounded-md transition-all flex items-center gap-1.5 text-sm font-semibold shrink-0"
                         >
                           <PlusCircle className="h-4 w-4" />
-                          Add
+                          <span className="hidden xs:inline">Add</span>
                         </button>
                       </div>
                     </div>
@@ -1607,7 +1770,7 @@ export default function AdminPage() {
                   <button
                     onClick={handleChangePassword}
                     disabled={isChangingPassword}
-                    className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-2.5 rounded-md transition-all flex items-center gap-2"
+                    className="w-full sm:w-auto bg-[#DC2626] hover:bg-[#B91C1C] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-2.5 rounded-md transition-all flex items-center justify-center gap-2"
                   >
                     {isChangingPassword ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -1694,11 +1857,11 @@ export default function AdminPage() {
                           </label>
                         </div>
                       </div>
-                      <div className="flex gap-3">
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <button
                           onClick={handleCreateAdmin}
                           disabled={isCreatingAdmin}
-                          className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-5 py-2.5 rounded-md transition-all flex items-center gap-2 text-sm"
+                          className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-5 py-2.5 rounded-md transition-all flex items-center justify-center gap-2 text-sm"
                         >
                           {isCreatingAdmin ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -1714,7 +1877,7 @@ export default function AdminPage() {
                             setNewAdminPassword('')
                             setNewAdminRole('admin')
                           }}
-                          className="bg-gray-700 hover:bg-gray-600 text-white font-medium px-5 py-2.5 rounded-md transition-colors text-sm"
+                          className="bg-gray-700 hover:bg-gray-600 text-white font-medium px-5 py-2.5 rounded-md transition-colors text-sm text-center"
                         >
                           {t('admin.cancel')}
                         </button>
@@ -1825,7 +1988,7 @@ export default function AdminPage() {
                 </p>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold px-6 py-2.5 rounded-md transition-colors border border-red-500/20 flex items-center gap-2"
+                  className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold px-6 py-2.5 rounded-md transition-colors border border-red-500/20 flex items-center justify-center gap-2"
                 >
                   <LogOut className="h-4 w-4" />
                   {t('admin.logout')}
@@ -1834,6 +1997,27 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+
+        {/* Mobile Bottom Navigation */}
+        <nav className="md:hidden bg-[#111111] border-t border-gray-800 flex items-center justify-around px-2 py-1 shrink-0 safe-area-bottom">
+          {sidebarItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setTab(item.id)
+                resetForm()
+              }}
+              className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-md transition-all ${
+                tab === item.id
+                  ? 'text-[#DC2626]'
+                  : 'text-gray-500'
+              }`}
+            >
+              <item.icon className="h-5 w-5" />
+              <span className="text-[10px] font-medium">{item.label}</span>
+            </button>
+          ))}
+        </nav>
       </main>
     </div>
   )
