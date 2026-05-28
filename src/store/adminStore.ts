@@ -1,10 +1,16 @@
 import { create } from 'zustand'
 
+interface AdminUser {
+  username: string
+  role: string
+}
+
 interface AdminState {
   isLoggedIn: boolean
   isPanelOpen: boolean
   showAdminPage: boolean
-  login: () => void
+  currentAdmin: AdminUser | null
+  login: (admin: AdminUser) => void
   logout: () => void
   setPanelOpen: (open: boolean) => void
   openAdminPage: () => void
@@ -15,10 +21,11 @@ export const useAdminStore = create<AdminState>((set) => ({
   isLoggedIn: false,
   isPanelOpen: false,
   showAdminPage: false,
+  currentAdmin: null,
 
-  login: () => set({ isLoggedIn: true }),
+  login: (admin: AdminUser) => set({ isLoggedIn: true, currentAdmin: admin }),
 
-  logout: () => set({ isLoggedIn: false, isPanelOpen: false, showAdminPage: false }),
+  logout: () => set({ isLoggedIn: false, isPanelOpen: false, showAdminPage: false, currentAdmin: null }),
 
   setPanelOpen: (open) => set({ isPanelOpen: open }),
 

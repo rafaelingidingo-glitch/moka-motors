@@ -1,13 +1,14 @@
 import { db } from '../src/lib/db'
 
 async function main() {
-  // Create admin user
+  // Create admin user (super_admin has full access including managing other admins)
   await db.admin.upsert({
     where: { username: 'admin' },
     update: {},
     create: {
       username: 'admin',
       password: 'mokamotors2024',
+      role: 'super_admin',
     },
   })
 

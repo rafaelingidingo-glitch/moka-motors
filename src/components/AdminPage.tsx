@@ -28,6 +28,11 @@ import {
   Link,
   Loader2,
   PlusCircle,
+  Users,
+  Shield,
+  KeyRound,
+  UserPlus,
+  Check,
 } from 'lucide-react'
 import { useAdminStore } from '@/store/adminStore'
 import { parseImages } from '@/lib/utils'
@@ -65,7 +70,7 @@ interface SparePart {
 type Tab = 'dashboard' | 'motorbikes' | 'spare-parts' | 'settings'
 
 export default function AdminPage() {
-  const { isLoggedIn, login, logout, closeAdminPage } = useAdminStore()
+  const { isLoggedIn, login, logout, closeAdminPage, currentAdmin } = useAdminStore()
   const [tab, setTab] = useState<Tab>('dashboard')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -81,6 +86,22 @@ export default function AdminPage() {
   const [imageList, setImageList] = useState<string[]>([])
   const [imageUrlInput, setImageUrlInput] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Admin management state
+  const [admins, setAdmins] = useState<Array<{ id: string; username: string; role: string; createdAt: string }>>([])
+  const [newAdminUsername, setNewAdminUsername] = useState('')
+  const [newAdminPassword, setNewAdminPassword] = useState('')
+  const [newAdminRole, setNewAdminRole] = useState('admin')
+  const [showNewAdminForm, setShowNewAdminForm] = useState(false)
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false)
+
+  // Change password state
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
 
   // Form state
   const [form, setForm] = useState<Record<string, string>>({
@@ -119,6 +140,18 @@ export default function AdminPage() {
     }
   }
 
+  const fetchAdmins = async () => {
+    try {
+      const res = await fetch('/api/admin/list', { credentials: 'include' })
+      if (res.ok) {
+        const data = await res.json()
+        setAdmins(data.admins)
+      }
+    } catch (err) {
+      console.error('Failed to fetch admins:', err)
+    }
+  }
+
   useEffect(() => {
     if (isLoggedIn) {
       fetch('/api/motorbikes', { credentials: 'include' })
@@ -129,6 +162,7 @@ export default function AdminPage() {
         .then((res) => { if (!res.ok) throw new Error(); return res.json() })
         .then((data) => setSpareParts(data))
         .catch(console.error)
+      fetchAdmins()
     }
   }, [isLoggedIn])
 
@@ -144,7 +178,7 @@ export default function AdminPage() {
       })
       const data = await res.json()
       if (data.success) {
-        login()
+        login({ username: data.username, role: data.role })
         setTab('dashboard')
         toast.success('Logged in successfully!')
       } else {
@@ -156,13 +190,121 @@ export default function AdminPage() {
   }
 
   const handleLogout = async () => {
-    // Clear the admin cookie by calling a logout or setting it client-side
+    // Clear the admin cookies
     document.cookie = 'admin_logged_in=; path=/; max-age=0'
+    document.cookie = 'admin_user=; path=/; max-age=0'
     logout()
     setTab('dashboard')
     setUsername('')
     setPassword('')
+    setCurrentPassword('')
+    setNewPassword('')
+    setConfirmPassword('')
     toast.success('Logged out')
+  }
+
+  const handleCreateAdmin = async () => {
+    if (!newAdminUsername.trim() || !newAdminPassword.trim()) {
+      toast.error('Username and password are required')
+      return
+    }
+    if (newAdminUsername.trim().length < 3) {
+      toast.error('Username must be at least 3 characters')
+      return
+    }
+    if (newAdminPassword.length < 6) {
+      toast.error('Password must be at least 6 characters')
+      return
+    }
+
+    setIsCreatingAdmin(true)
+    try {
+      const res = await fetch('/api/admin/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: newAdminUsername.trim(),
+          password: newAdminPassword,
+          role: newAdminRole,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success(`Admin "${newAdminUsername.trim()}" created successfully!`)
+        setNewAdminUsername('')
+        setNewAdminPassword('')
+        setNewAdminRole('admin')
+        setShowNewAdminForm(false)
+        fetchAdmins()
+      } else {
+        toast.error(data.error || 'Failed to create admin')
+      }
+    } catch {
+      toast.error('Failed to create admin')
+    } finally {
+      setIsCreatingAdmin(false)
+    }
+  }
+
+  const handleDeleteAdmin = async (adminId: string, adminUsername: string) => {
+    if (!confirm(`Are you sure you want to delete admin "${adminUsername}"? This action cannot be undone.`)) return
+    try {
+      const res = await fetch(`/api/admin/delete?id=${adminId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success(`Admin "${adminUsername}" deleted`)
+        fetchAdmins()
+      } else {
+        toast.error(data.error || 'Failed to delete admin')
+      }
+    } catch {
+      toast.error('Failed to delete admin')
+    }
+  }
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error('All fields are required')
+      return
+    }
+    if (newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('New passwords do not match')
+      return
+    }
+
+    setIsChangingPassword(true)
+    try {
+      const res = await fetch('/api/admin/change-password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success('Password changed successfully!')
+        setCurrentPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+      } else {
+        toast.error(data.error || 'Failed to change password')
+      }
+    } catch {
+      toast.error('Failed to change password')
+    } finally {
+      setIsChangingPassword(false)
+    }
   }
 
   const resetForm = () => {
@@ -657,10 +799,10 @@ export default function AdminPage() {
               </button>
               <div className="flex items-center gap-2 ml-2">
                 <div className="w-8 h-8 bg-[#DC2626] rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">A</span>
+                  <span className="text-white text-xs font-bold">{currentAdmin?.username?.charAt(0).toUpperCase() || 'A'}</span>
                 </div>
                 {sidebarOpen !== false && (
-                  <span className="text-gray-300 text-sm font-medium hidden md:block">Admin</span>
+                  <span className="text-gray-300 text-sm font-medium hidden md:block">{currentAdmin?.username || 'Admin'}</span>
                 )}
               </div>
             </div>
@@ -1345,30 +1487,278 @@ export default function AdminPage() {
           {/* ===== SETTINGS TAB ===== */}
           {tab === 'settings' && (
             <div className="max-w-2xl space-y-6">
+              {/* Account Information */}
               <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
-                <h3 className="text-white font-bold text-lg mb-6">Account Settings</h3>
+                <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-[#DC2626]" />
+                  Account Information
+                </h3>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-300 mb-2">Username</label>
                     <input
                       type="text"
-                      value="admin"
+                      value={currentAdmin?.username || 'admin'}
                       readOnly
                       className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-gray-500 cursor-not-allowed"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-300 mb-2">Role</label>
-                    <input
-                      type="text"
-                      value="Super Admin"
-                      readOnly
-                      className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-gray-500 cursor-not-allowed"
-                    />
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="text"
+                        value={currentAdmin?.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                        readOnly
+                        className="flex-1 px-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-gray-500 cursor-not-allowed"
+                      />
+                      <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${
+                        currentAdmin?.role === 'super_admin'
+                          ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+                          : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                      }`}>
+                        {currentAdmin?.role === 'super_admin' ? 'Full Access' : 'Standard'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
+              {/* Change Password */}
+              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
+                <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
+                  <KeyRound className="h-5 w-5 text-[#DC2626]" />
+                  Change Password
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">Current Password</label>
+                    <div className="relative">
+                      <input
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="w-full px-4 py-3 pr-12 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
+                        placeholder="Enter current password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                      >
+                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">New Password</label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full px-4 py-3 pr-12 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
+                        placeholder="Enter new password (min 6 characters)"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                      >
+                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-2">Confirm New Password</label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
+                      placeholder="Confirm new password"
+                    />
+                  </div>
+                  <button
+                    onClick={handleChangePassword}
+                    disabled={isChangingPassword}
+                    className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-2.5 rounded-md transition-all flex items-center gap-2"
+                  >
+                    {isChangingPassword ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
+                    {isChangingPassword ? 'Changing...' : 'Change Password'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Manage Admins - Only visible to super_admin */}
+              {currentAdmin?.role === 'super_admin' && (
+                <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-white font-bold text-lg flex items-center gap-2">
+                      <Users className="h-5 w-5 text-[#DC2626]" />
+                      Manage Admins
+                    </h3>
+                    <button
+                      onClick={() => setShowNewAdminForm(!showNewAdminForm)}
+                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      Add Admin
+                    </button>
+                  </div>
+
+                  {/* New Admin Form */}
+                  {showNewAdminForm && (
+                    <div className="bg-[#111111] rounded-md border border-gray-700 p-5 mb-6 space-y-4">
+                      <h4 className="text-white font-semibold text-sm flex items-center gap-2">
+                        <PlusCircle className="h-4 w-4 text-[#DC2626]" />
+                        Create New Admin
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-300 mb-2">Username</label>
+                          <input
+                            type="text"
+                            value={newAdminUsername}
+                            onChange={(e) => setNewAdminUsername(e.target.value)}
+                            className="w-full px-4 py-3 bg-[#0F0F0F] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
+                            placeholder="Min 3 characters"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
+                          <input
+                            type="password"
+                            value={newAdminPassword}
+                            onChange={(e) => setNewAdminPassword(e.target.value)}
+                            className="w-full px-4 py-3 bg-[#0F0F0F] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
+                            placeholder="Min 6 characters"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-300 mb-2">Role</label>
+                        <div className="flex gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="newAdminRole"
+                              value="admin"
+                              checked={newAdminRole === 'admin'}
+                              onChange={(e) => setNewAdminRole(e.target.value)}
+                              className="accent-[#DC2626]"
+                            />
+                            <span className="text-gray-300 text-sm">Admin</span>
+                            <span className="text-gray-600 text-xs">(Can add/edit motorbikes & spare parts)</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="newAdminRole"
+                              value="super_admin"
+                              checked={newAdminRole === 'super_admin'}
+                              onChange={(e) => setNewAdminRole(e.target.value)}
+                              className="accent-[#DC2626]"
+                            />
+                            <span className="text-gray-300 text-sm">Super Admin</span>
+                            <span className="text-gray-600 text-xs">(Full access + manage admins)</span>
+                          </label>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleCreateAdmin}
+                          disabled={isCreatingAdmin}
+                          className="bg-[#DC2626] hover:bg-[#B91C1C] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-5 py-2.5 rounded-md transition-all flex items-center gap-2 text-sm"
+                        >
+                          {isCreatingAdmin ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Plus className="h-4 w-4" />
+                          )}
+                          {isCreatingAdmin ? 'Creating...' : 'Create Admin'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowNewAdminForm(false)
+                            setNewAdminUsername('')
+                            setNewAdminPassword('')
+                            setNewAdminRole('admin')
+                          }}
+                          className="bg-gray-700 hover:bg-gray-600 text-white font-medium px-5 py-2.5 rounded-md transition-colors text-sm"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Admin List */}
+                  <div className="space-y-2">
+                    {admins.map((admin) => (
+                      <div
+                        key={admin.id}
+                        className="flex items-center justify-between bg-[#111111] rounded-md border border-gray-800 p-4 hover:border-gray-700 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            admin.role === 'super_admin'
+                              ? 'bg-yellow-500/10'
+                              : 'bg-blue-500/10'
+                          }`}>
+                            <span className={`text-sm font-bold ${
+                              admin.role === 'super_admin' ? 'text-yellow-400' : 'text-blue-400'
+                            }`}>
+                              {admin.username.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-white font-semibold text-sm">{admin.username}</p>
+                              {admin.username === currentAdmin?.username && (
+                                <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded font-semibold">You</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                                admin.role === 'super_admin'
+                                  ? 'bg-yellow-500/10 text-yellow-400'
+                                  : 'bg-blue-500/10 text-blue-400'
+                              }`}>
+                                {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                              </span>
+                              <span className="text-gray-600 text-xs">
+                                Created {new Date(admin.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {admin.username !== currentAdmin?.username && (
+                          <button
+                            onClick={() => handleDeleteAdmin(admin.id, admin.username)}
+                            className="p-2 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors"
+                            title="Delete Admin"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    {admins.length === 0 && (
+                      <div className="text-center py-8">
+                        <Users className="h-10 w-10 text-gray-700 mx-auto mb-2" />
+                        <p className="text-gray-500 text-sm">No admins found</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Store Information */}
               <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
                 <h3 className="text-white font-bold text-lg mb-6">Store Information</h3>
                 <div className="space-y-4">
@@ -1402,6 +1792,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* Danger Zone */}
               <div className="bg-red-500/5 rounded-md border border-red-500/20 p-6">
                 <h3 className="text-red-400 font-bold text-lg mb-2">Danger Zone</h3>
                 <p className="text-gray-400 text-sm mb-4">

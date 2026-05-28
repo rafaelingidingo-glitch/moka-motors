@@ -27,14 +27,24 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       success: true,
       username: admin.username,
+      role: admin.role,
     })
 
-    // Set an httpOnly admin session cookie (7 days)
-    response.cookies.set('admin_logged_in', 'true', {
+    // Set an httpOnly admin session cookie with the username (7 days)
+    response.cookies.set('admin_user', admin.username, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+    })
+
+    // Keep backward compatibility cookie
+    response.cookies.set('admin_logged_in', 'true', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
       path: '/',
     })
 

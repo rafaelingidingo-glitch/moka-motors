@@ -41,7 +41,9 @@ model SparePart {
 }
 
 model Admin {
-  id       String @id @default(cuid())
-  username String @unique
-  password String
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
 }
