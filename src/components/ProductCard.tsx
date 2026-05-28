@@ -1,9 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { useCartStore } from '@/store/cartStore'
 import { useLikeStore } from '@/store/likeStore'
 import { getProductInquiryMessage, getWhatsAppUrl } from '@/lib/whatsapp'
-import { ShoppingCart, Star, MessageCircle, Gauge, Calendar, Cog } from 'lucide-react'
+import { ShoppingCart, Star, MessageCircle, Gauge, Calendar, Cog, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Motorbike {
@@ -17,22 +18,48 @@ interface Motorbike {
   mileage: string | null
   color: string | null
   description: string
-  imageUrl: string
+  images: string
   featured: boolean
   isNewStock: boolean
+}
+
+function parseImages(images: string): string[] {
+  try {
+    const parsed = JSON.parse(images)
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    return []
+  } catch {
+    return []
+  }
 }
 
 export default function ProductCard({ bike }: { bike: Motorbike }) {
   const { addItem } = useCartStore()
   const { toggleLike, isLiked } = useLikeStore()
   const liked = isLiked(bike.id)
+  const images = parseImages(bike.images)
+  const [currentImage, setCurrentImage] = useState(0)
+
+  const hasMultipleImages = images.length > 1
+
+  const goToPrev = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+  }
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setCurrentImage((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+  }
+
+  const primaryImage = images[0] || '/images/placeholder.png'
 
   const handleAddToCart = () => {
     addItem({
       id: bike.id,
       name: bike.name,
       price: bike.price,
-      imageUrl: bike.imageUrl,
+      imageUrl: primaryImage,
       brand: bike.brand,
       type: 'motorbike',
     })
@@ -44,12 +71,44 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
       {/* Image */}
       <div className="relative overflow-hidden bg-[#F5F5F5]">
         <img
-          src={bike.imageUrl}
+          src={images[currentImage] || '/images/placeholder.png'}
           alt={bike.name}
           className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-700"
         />
+        {/* Navigation Arrows */}
+        {hasMultipleImages && (
+          <>
+            <button
+              onClick={goToPrev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={goToNext}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+              aria-label="Next image"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            {/* Image Dots Indicator */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+              {images.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => { e.stopPropagation(); setCurrentImage(idx) }}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    idx === currentImage ? 'bg-white w-4' : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                  aria-label={`Go to image ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex gap-2">
+        <div className="absolute top-3 left-3 flex gap-2 z-10">
           {bike.featured && (
             <span className="bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-sm flex items-center gap-1 uppercase tracking-wider">
               <Star className="h-3 w-3" /> Featured
@@ -64,7 +123,7 @@ export default function ProductCard({ bike }: { bike: Motorbike }) {
         {/* Like Button */}
         <button
           onClick={() => toggleLike(bike.id)}
-          className="absolute top-3 right-3 bg-white/90 hover:bg-white p-2 rounded-full transition-all shadow-sm hover:shadow-md"
+          className="absolute top-3 right-3 bg-white/90 hover:bg-white p-2 rounded-full transition-all shadow-sm hover:shadow-md z-10"
           aria-label="Like"
         >
           <svg

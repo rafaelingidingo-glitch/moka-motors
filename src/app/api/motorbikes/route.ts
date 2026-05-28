@@ -64,6 +64,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    const images = Array.isArray(body.images) ? JSON.stringify(body.images) : (typeof body.images === 'string' ? body.images : '[]')
+
     const motorbike = await db.motorbike.create({
       data: {
         name: body.name,
@@ -75,7 +77,7 @@ export async function POST(request: NextRequest) {
         mileage: body.mileage || null,
         color: body.color || null,
         description: body.description,
-        imageUrl: body.imageUrl,
+        images,
         featured: body.featured || false,
         isNewStock: body.isNewStock || false,
       },

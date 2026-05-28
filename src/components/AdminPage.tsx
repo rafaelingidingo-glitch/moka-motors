@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus,
@@ -27,9 +27,20 @@ import {
   X,
   Link,
   Loader2,
+  PlusCircle,
 } from 'lucide-react'
 import { useAdminStore } from '@/store/adminStore'
 import { toast } from 'sonner'
+
+function parseImages(images: string): string[] {
+  try {
+    const parsed = JSON.parse(images)
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    return []
+  } catch {
+    return []
+  }
+}
 
 interface Motorbike {
   id: string
@@ -42,7 +53,7 @@ interface Motorbike {
   mileage: string | null
   color: string | null
   description: string
-  imageUrl: string
+  images: string
   featured: boolean
   isNewStock: boolean
 }
@@ -55,7 +66,7 @@ interface SparePart {
   compatibility: string
   price: number
   description: string
-  imageUrl: string
+  images: string
   inStock: boolean
   featured: boolean
 }
@@ -75,9 +86,10 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
-  const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload')
   const [isUploading, setIsUploading] = useState(false)
-  const [uploadPreview, setUploadPreview] = useState<string | null>(null)
+  const [imageList, setImageList] = useState<string[]>([])
+  const [imageUrlInput, setImageUrlInput] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Form state
   const [form, setForm] = useState<Record<string, string>>({
@@ -90,7 +102,6 @@ export default function AdminPage() {
     mileage: '',
     color: '',
     description: '',
-    imageUrl: '',
     type: '',
     compatibility: '',
   })
@@ -161,23 +172,23 @@ export default function AdminPage() {
       mileage: '',
       color: '',
       description: '',
-      imageUrl: '',
       type: '',
       compatibility: '',
     })
     setEditingItem(null)
     setIsAdding(false)
     setShowForm(false)
-    setUploadPreview(null)
-    setImageMode('upload')
+    setImageList([])
+    setImageUrlInput('')
   }
 
   const handleEditMotorbike = (bike: Motorbike) => {
     setEditingItem(bike)
     setIsAdding(false)
     setShowForm(true)
-    setUploadPreview(null)
-    setImageMode(bike.imageUrl.startsWith('/uploads/') ? 'upload' : 'url')
+    const parsedImages = parseImages(bike.images)
+    setImageList(parsedImages)
+    setImageUrlInput('')
     setForm({
       name: bike.name,
       brand: bike.brand,
@@ -188,7 +199,6 @@ export default function AdminPage() {
       mileage: bike.mileage || '',
       color: bike.color || '',
       description: bike.description,
-      imageUrl: bike.imageUrl,
       type: '',
       compatibility: '',
     })
@@ -198,8 +208,9 @@ export default function AdminPage() {
     setEditingItem(part)
     setIsAdding(false)
     setShowForm(true)
-    setUploadPreview(null)
-    setImageMode(part.imageUrl.startsWith('/uploads/') ? 'upload' : 'url')
+    const parsedImages = parseImages(part.images)
+    setImageList(parsedImages)
+    setImageUrlInput('')
     setForm({
       name: part.name,
       brand: part.brand,
@@ -210,7 +221,6 @@ export default function AdminPage() {
       mileage: '',
       color: '',
       description: part.description,
-      imageUrl: part.imageUrl,
       type: part.type,
       compatibility: part.compatibility,
     })
@@ -227,7 +237,7 @@ export default function AdminPage() {
       mileage: form.mileage || null,
       color: form.color || null,
       description: form.description,
-      imageUrl: form.imageUrl,
+      images: JSON.stringify(imageList),
       featured: false,
       isNewStock: false,
     }
@@ -263,7 +273,7 @@ export default function AdminPage() {
       compatibility: form.compatibility,
       price: form.price,
       description: form.description,
-      imageUrl: form.imageUrl,
+      images: JSON.stringify(imageList),
       inStock: true,
       featured: false,
     }
@@ -366,6 +376,58 @@ export default function AdminPage() {
     } catch {
       toast.error('Failed to update')
     }
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate size
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File too large. Maximum size is 5MB.')
+      return
+    }
+
+    // Upload to server
+    setIsUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+      if (data.success) {
+        setImageList((prev) => [...prev, data.url])
+        toast.success('Image uploaded successfully!')
+      } else {
+        toast.error(data.error || 'Upload failed')
+      }
+    } catch {
+      toast.error('Upload failed. Please try again.')
+    } finally {
+      setIsUploading(false)
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const handleAddImageUrl = () => {
+    const url = imageUrlInput.trim()
+    if (!url) {
+      toast.error('Please enter an image URL')
+      return
+    }
+    setImageList((prev) => [...prev, url])
+    setImageUrlInput('')
+    toast.success('Image URL added!')
+  }
+
+  const handleRemoveImage = (index: number) => {
+    setImageList((prev) => prev.filter((_, i) => i !== index))
   }
 
   // ============ LOGIN SCREEN ============
@@ -621,7 +683,7 @@ export default function AdminPage() {
                   <h3 className="text-white font-bold text-lg mb-4">Quick Actions</h3>
                   <div className="space-y-3">
                     <button
-                      onClick={() => { setTab('motorbikes'); setIsAdding(true); setShowForm(true); setUploadPreview(null); setImageMode('upload') }}
+                      onClick={() => { setTab('motorbikes'); setIsAdding(true); setShowForm(true); setImageList([]); setImageUrlInput('') }}
                       className="w-full flex items-center gap-3 bg-[#111111] hover:bg-[#DC2626]/10 border border-gray-700 hover:border-[#DC2626]/30 rounded-md p-3 transition-all text-left group"
                     >
                       <div className="bg-[#DC2626]/10 group-hover:bg-[#DC2626]/20 p-2 rounded-md transition-colors">
@@ -634,7 +696,7 @@ export default function AdminPage() {
                       <ChevronRight className="h-4 w-4 text-gray-600 ml-auto" />
                     </button>
                     <button
-                      onClick={() => { setTab('spare-parts'); setIsAdding(true); setShowForm(true); setUploadPreview(null); setImageMode('upload') }}
+                      onClick={() => { setTab('spare-parts'); setIsAdding(true); setShowForm(true); setImageList([]); setImageUrlInput('') }}
                       className="w-full flex items-center gap-3 bg-[#111111] hover:bg-[#DC2626]/10 border border-gray-700 hover:border-[#DC2626]/30 rounded-md p-3 transition-all text-left group"
                     >
                       <div className="bg-[#DC2626]/10 group-hover:bg-[#DC2626]/20 p-2 rounded-md transition-colors">
@@ -755,76 +817,86 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredMotorbikes.map((bike) => (
-                        <tr key={bike.id} className="border-b border-gray-800/50 hover:bg-white/[0.02] transition-colors">
-                          <td className="px-5 py-4">
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={bike.imageUrl}
-                                alt={bike.name}
-                                className="w-12 h-12 object-cover rounded-md shrink-0 bg-[#111111]"
-                              />
-                              <div>
-                                <p className="text-white text-sm font-semibold">{bike.name}</p>
-                                <p className="text-gray-500 text-xs">{bike.year} • {bike.engineSize}</p>
+                      {filteredMotorbikes.map((bike) => {
+                        const bikeImages = parseImages(bike.images)
+                        const firstImage = bikeImages.length > 0 ? bikeImages[0] : ''
+                        return (
+                          <tr key={bike.id} className="border-b border-gray-800/50 hover:bg-white/[0.02] transition-colors">
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-3">
+                                {firstImage ? (
+                                  <img
+                                    src={firstImage}
+                                    alt={bike.name}
+                                    className="w-12 h-12 object-cover rounded-md shrink-0 bg-[#111111]"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-[#111111] rounded-md shrink-0 flex items-center justify-center">
+                                    <ImageIcon className="h-5 w-5 text-gray-600" />
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-white text-sm font-semibold">{bike.name}</p>
+                                  <p className="text-gray-500 text-xs">{bike.year} • {bike.engineSize}</p>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className="text-gray-300 text-sm">{bike.brand}</span>
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className="text-gray-300 text-sm">{bike.category}</span>
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className="text-[#DC2626] font-bold text-sm">TZS {bike.price.toLocaleString()}</span>
-                          </td>
-                          <td className="px-5 py-4">
-                            <div className="flex gap-1.5">
-                              {bike.featured && (
-                                <span className="text-[10px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded font-semibold">Featured</span>
-                              )}
-                              {bike.isNewStock && (
-                                <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded font-semibold">New</span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-5 py-4">
-                            <div className="flex items-center justify-end gap-1">
-                              <button
-                                onClick={() => handleToggleFeatured(bike.id, 'motorbike', bike.featured)}
-                                className={`p-1.5 rounded transition-colors ${
-                                  bike.featured ? 'text-yellow-400 hover:bg-yellow-500/10' : 'text-gray-600 hover:bg-white/5'
-                                }`}
-                                title="Toggle Featured"
-                              >
-                                <Star className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleToggleNewStock(bike.id, bike.isNewStock)}
-                                className={`p-1.5 rounded transition-colors text-xs font-bold ${
-                                  bike.isNewStock ? 'text-green-400 hover:bg-green-500/10' : 'text-gray-600 hover:bg-white/5'
-                                }`}
-                                title="Toggle New Stock"
-                              >
-                                NEW
-                              </button>
-                              <button
-                                onClick={() => handleEditMotorbike(bike)}
-                                className="p-1.5 text-gray-600 hover:text-blue-400 hover:bg-blue-500/10 rounded transition-colors"
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteMotorbike(bike.id)}
-                                className="p-1.5 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="text-gray-300 text-sm">{bike.brand}</span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="text-gray-300 text-sm">{bike.category}</span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="text-[#DC2626] font-bold text-sm">TZS {bike.price.toLocaleString()}</span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex gap-1.5">
+                                {bike.featured && (
+                                  <span className="text-[10px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded font-semibold">Featured</span>
+                                )}
+                                {bike.isNewStock && (
+                                  <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded font-semibold">New</span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex items-center justify-end gap-1">
+                                <button
+                                  onClick={() => handleToggleFeatured(bike.id, 'motorbike', bike.featured)}
+                                  className={`p-1.5 rounded transition-colors ${
+                                    bike.featured ? 'text-yellow-400 hover:bg-yellow-500/10' : 'text-gray-600 hover:bg-white/5'
+                                  }`}
+                                  title="Toggle Featured"
+                                >
+                                  <Star className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleToggleNewStock(bike.id, bike.isNewStock)}
+                                  className={`p-1.5 rounded transition-colors text-xs font-bold ${
+                                    bike.isNewStock ? 'text-green-400 hover:bg-green-500/10' : 'text-gray-600 hover:bg-white/5'
+                                  }`}
+                                  title="Toggle New Stock"
+                                >
+                                  NEW
+                                </button>
+                                <button
+                                  onClick={() => handleEditMotorbike(bike)}
+                                  className="p-1.5 text-gray-600 hover:text-blue-400 hover:bg-blue-500/10 rounded transition-colors"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteMotorbike(bike.id)}
+                                  className="p-1.5 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
                       {filteredMotorbikes.length === 0 && (
                         <tr>
                           <td colSpan={6} className="px-5 py-16 text-center">
@@ -877,78 +949,88 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredSpareParts.map((part) => (
-                        <tr key={part.id} className="border-b border-gray-800/50 hover:bg-white/[0.02] transition-colors">
-                          <td className="px-5 py-4">
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={part.imageUrl}
-                                alt={part.name}
-                                className="w-12 h-12 object-cover rounded-md shrink-0 bg-[#111111]"
-                              />
-                              <div>
-                                <p className="text-white text-sm font-semibold">{part.name}</p>
-                                <p className="text-gray-500 text-xs">{part.compatibility}</p>
+                      {filteredSpareParts.map((part) => {
+                        const partImages = parseImages(part.images)
+                        const firstImage = partImages.length > 0 ? partImages[0] : ''
+                        return (
+                          <tr key={part.id} className="border-b border-gray-800/50 hover:bg-white/[0.02] transition-colors">
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-3">
+                                {firstImage ? (
+                                  <img
+                                    src={firstImage}
+                                    alt={part.name}
+                                    className="w-12 h-12 object-cover rounded-md shrink-0 bg-[#111111]"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-[#111111] rounded-md shrink-0 flex items-center justify-center">
+                                    <ImageIcon className="h-5 w-5 text-gray-600" />
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-white text-sm font-semibold">{part.name}</p>
+                                  <p className="text-gray-500 text-xs">{part.compatibility}</p>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className="text-gray-300 text-sm">{part.brand}</span>
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className="text-gray-300 text-sm">{part.type}</span>
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className="text-[#DC2626] font-bold text-sm">TZS {part.price.toLocaleString()}</span>
-                          </td>
-                          <td className="px-5 py-4">
-                            <div className="flex gap-1.5">
-                              {part.featured && (
-                                <span className="text-[10px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded font-semibold">Featured</span>
-                              )}
-                              <span className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
-                                part.inStock ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
-                              }`}>
-                                {part.inStock ? 'In Stock' : 'Out'}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4">
-                            <div className="flex items-center justify-end gap-1">
-                              <button
-                                onClick={() => handleToggleFeatured(part.id, 'spare-part', part.featured)}
-                                className={`p-1.5 rounded transition-colors ${
-                                  part.featured ? 'text-yellow-400 hover:bg-yellow-500/10' : 'text-gray-600 hover:bg-white/5'
-                                }`}
-                                title="Toggle Featured"
-                              >
-                                <Star className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleToggleInStock(part.id, part.inStock)}
-                                className={`p-1.5 rounded transition-colors text-xs font-bold ${
-                                  part.inStock ? 'text-green-400 hover:bg-green-500/10' : 'text-red-400 hover:bg-red-500/10'
-                                }`}
-                                title="Toggle Stock"
-                              >
-                                {part.inStock ? '✓' : '✗'}
-                              </button>
-                              <button
-                                onClick={() => handleEditSparePart(part)}
-                                className="p-1.5 text-gray-600 hover:text-blue-400 hover:bg-blue-500/10 rounded transition-colors"
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteSparePart(part.id)}
-                                className="p-1.5 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="text-gray-300 text-sm">{part.brand}</span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="text-gray-300 text-sm">{part.type}</span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="text-[#DC2626] font-bold text-sm">TZS {part.price.toLocaleString()}</span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex gap-1.5">
+                                {part.featured && (
+                                  <span className="text-[10px] bg-yellow-500/10 text-yellow-400 px-2 py-0.5 rounded font-semibold">Featured</span>
+                                )}
+                                <span className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
+                                  part.inStock ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                                }`}>
+                                  {part.inStock ? 'In Stock' : 'Out'}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex items-center justify-end gap-1">
+                                <button
+                                  onClick={() => handleToggleFeatured(part.id, 'spare-part', part.featured)}
+                                  className={`p-1.5 rounded transition-colors ${
+                                    part.featured ? 'text-yellow-400 hover:bg-yellow-500/10' : 'text-gray-600 hover:bg-white/5'
+                                  }`}
+                                  title="Toggle Featured"
+                                >
+                                  <Star className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleToggleInStock(part.id, part.inStock)}
+                                  className={`p-1.5 rounded transition-colors text-xs font-bold ${
+                                    part.inStock ? 'text-green-400 hover:bg-green-500/10' : 'text-red-400 hover:bg-red-500/10'
+                                  }`}
+                                  title="Toggle Stock"
+                                >
+                                  {part.inStock ? '✓' : '✗'}
+                                </button>
+                                <button
+                                  onClick={() => handleEditSparePart(part)}
+                                  className="p-1.5 text-gray-600 hover:text-blue-400 hover:bg-blue-500/10 rounded transition-colors"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteSparePart(part.id)}
+                                  className="p-1.5 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
                       {filteredSpareParts.length === 0 && (
                         <tr>
                           <td colSpan={6} className="px-5 py-16 text-center">
@@ -1118,165 +1200,114 @@ export default function AdminPage() {
                       placeholder="Product description..."
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3">Product Image</label>
-                    
-                    {/* Mode Toggle */}
-                    <div className="flex gap-1 mb-4 bg-[#111111] rounded-md p-1 border border-gray-700">
-                      <button
-                        type="button"
-                        onClick={() => setImageMode('upload')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2 rounded text-sm font-semibold transition-all ${
-                          imageMode === 'upload'
-                            ? 'bg-[#DC2626] text-white shadow'
-                            : 'text-gray-400 hover:text-white'
-                        }`}
-                      >
-                        <Upload className="h-4 w-4" />
-                        Upload File
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setImageMode('url')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2 rounded text-sm font-semibold transition-all ${
-                          imageMode === 'url'
-                            ? 'bg-[#DC2626] text-white shadow'
-                            : 'text-gray-400 hover:text-white'
-                        }`}
-                      >
-                        <Link className="h-4 w-4" />
-                        Image URL
-                      </button>
-                    </div>
 
-                    {/* Upload Mode */}
-                    {imageMode === 'upload' && (
+                  {/* ===== MULTI-IMAGE SECTION ===== */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-300 mb-3">Product Images</label>
+
+                    {/* Image Gallery */}
+                    {imageList.length > 0 && (
+                      <div className="flex flex-wrap gap-3 mb-4">
+                        {imageList.map((img, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={img}
+                              alt={`Product image ${index + 1}`}
+                              className="w-20 h-20 object-cover rounded-md border border-gray-700 bg-[#111111]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(index)}
+                              className="absolute -top-2 -right-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white p-0.5 rounded-full transition-colors opacity-0 group-hover:opacity-100 shadow-lg"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                            <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-[9px] text-white text-center py-0.5 rounded-b-md">
+                              {index === 0 ? 'Main' : `#${index + 1}`}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {imageList.length === 0 && (
+                      <div className="mb-4 bg-[#111111] border border-dashed border-gray-700 rounded-md p-6 text-center">
+                        <ImageIcon className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                        <p className="text-gray-500 text-sm">No images added yet</p>
+                        <p className="text-gray-600 text-xs mt-1">Upload files or add URLs below</p>
+                      </div>
+                    )}
+
+                    {/* Add Image Methods */}
+                    <div className="space-y-3">
+                      {/* File Upload */}
                       <div>
-                        <label
-                          htmlFor="image-upload"
-                          className={`relative flex flex-col items-center justify-center w-full h-44 border-2 border-dashed rounded-md cursor-pointer transition-all ${
+                        <input
+                          ref={fileInputRef}
+                          id="image-upload"
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                          className="hidden"
+                          onChange={handleFileUpload}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isUploading}
+                          className={`w-full flex items-center justify-center gap-2 py-3 rounded-md text-sm font-semibold transition-all border ${
                             isUploading
-                              ? 'border-[#DC2626]/50 bg-[#DC2626]/5'
-                              : uploadPreview || form.imageUrl
-                                ? 'border-green-500/30 bg-green-500/5'
-                                : 'border-gray-700 bg-[#111111] hover:border-[#DC2626]/50 hover:bg-[#DC2626]/5'
+                              ? 'border-[#DC2626]/50 bg-[#DC2626]/5 text-[#DC2626] cursor-wait'
+                              : 'border-gray-700 bg-[#111111] hover:border-[#DC2626]/50 hover:bg-[#DC2626]/5 text-gray-300 hover:text-white'
                           }`}
                         >
                           {isUploading ? (
-                            <div className="flex flex-col items-center">
-                              <Loader2 className="h-8 w-8 text-[#DC2626] animate-spin mb-2" />
-                              <p className="text-gray-400 text-sm">Uploading...</p>
-                            </div>
-                          ) : uploadPreview || form.imageUrl ? (
-                            <div className="relative w-full h-full p-2">
-                              <img
-                                src={uploadPreview || form.imageUrl}
-                                alt="Preview"
-                                className="w-full h-full object-contain rounded"
-                              />
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                  setUploadPreview(null)
-                                  setForm({ ...form, imageUrl: '' })
-                                }}
-                                className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition-colors"
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                              <div className="absolute bottom-3 left-3 bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1">
-                                <ImageIcon className="h-3 w-3" />
-                                Image uploaded
-                              </div>
-                            </div>
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Uploading...
+                            </>
                           ) : (
-                            <div className="flex flex-col items-center">
-                              <Upload className="h-8 w-8 text-gray-500 mb-2" />
-                              <p className="text-gray-300 text-sm font-medium">Click to upload image</p>
-                              <p className="text-gray-600 text-xs mt-1">JPEG, PNG, GIF, WebP, SVG (max 5MB)</p>
-                            </div>
+                            <>
+                              <Upload className="h-4 w-4" />
+                              Upload Image File
+                            </>
                           )}
-                          <input
-                            id="image-upload"
-                            type="file"
-                            accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
-                            className="hidden"
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0]
-                              if (!file) return
-
-                              // Validate size
-                              if (file.size > 5 * 1024 * 1024) {
-                                toast.error('File too large. Maximum size is 5MB.')
-                                return
-                              }
-
-                              // Show preview immediately
-                              const reader = new FileReader()
-                              reader.onload = (ev) => {
-                                setUploadPreview(ev.target?.result as string)
-                              }
-                              reader.readAsDataURL(file)
-
-                              // Upload to server
-                              setIsUploading(true)
-                              try {
-                                const formData = new FormData()
-                                formData.append('file', file)
-                                const res = await fetch('/api/upload', {
-                                  method: 'POST',
-                                  body: formData,
-                                })
-                                const data = await res.json()
-                                if (data.success) {
-                                  setForm({ ...form, imageUrl: data.url })
-                                  toast.success('Image uploaded successfully!')
-                                } else {
-                                  toast.error(data.error || 'Upload failed')
-                                  setUploadPreview(null)
-                                }
-                              } catch {
-                                toast.error('Upload failed. Please try again.')
-                                setUploadPreview(null)
-                              } finally {
-                                setIsUploading(false)
-                              }
-                            }}
-                          />
-                        </label>
+                        </button>
                       </div>
-                    )}
 
-                    {/* URL Mode */}
-                    {imageMode === 'url' && (
-                      <div className="space-y-3">
-                        <div className="relative">
+                      {/* URL Input */}
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
                           <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                           <input
                             type="text"
-                            value={form.imageUrl}
-                            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                            value={imageUrlInput}
+                            onChange={(e) => setImageUrlInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                handleAddImageUrl()
+                              }
+                            }}
                             className="w-full pl-10 pr-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                            placeholder="https://example.com/image.png or /images/bike.png"
+                            placeholder="https://example.com/image.png"
                           />
                         </div>
-                        {form.imageUrl && (
-                          <div className="relative bg-[#111111] border border-gray-700 rounded-md p-3 h-32">
-                            <img
-                              src={form.imageUrl}
-                              alt="Preview"
-                              className="w-full h-full object-contain"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none'
-                              }}
-                            />
-                          </div>
-                        )}
+                        <button
+                          type="button"
+                          onClick={handleAddImageUrl}
+                          className="bg-[#111111] hover:bg-[#DC2626]/10 border border-gray-700 hover:border-[#DC2626]/30 text-gray-300 hover:text-white px-4 rounded-md transition-all flex items-center gap-1.5 text-sm font-semibold shrink-0"
+                        >
+                          <PlusCircle className="h-4 w-4" />
+                          Add
+                        </button>
                       </div>
-                    )}
+                    </div>
+
+                    <p className="text-gray-600 text-xs mt-2">
+                      {imageList.length} image{imageList.length !== 1 ? 's' : ''} added. First image will be the main product photo.
+                    </p>
                   </div>
+
                   <div className="flex gap-4 pt-4">
                     <button
                       onClick={tab === 'motorbikes' ? handleSaveMotorbike : handleSaveSparePart}

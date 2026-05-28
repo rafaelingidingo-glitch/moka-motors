@@ -19,9 +19,19 @@ interface Motorbike {
   mileage: string | null
   color: string | null
   description: string
-  imageUrl: string
+  images: string
   featured: boolean
   isNewStock: boolean
+}
+
+function parseImages(images: string): string[] {
+  try {
+    const parsed = JSON.parse(images)
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    return []
+  } catch {
+    return []
+  }
 }
 
 export default function NewStockSection() {
@@ -88,7 +98,7 @@ export default function NewStockSection() {
               {/* Image */}
               <div className="relative overflow-hidden">
                 <img
-                  src={bike.imageUrl}
+                  src={parseImages(bike.images)[0] || '/images/placeholder.png'}
                   alt={bike.name}
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -144,7 +154,7 @@ export default function NewStockSection() {
                         id: bike.id,
                         name: bike.name,
                         price: bike.price,
-                        imageUrl: bike.imageUrl,
+                        imageUrl: parseImages(bike.images)[0] || '/images/placeholder.png',
                         brand: bike.brand,
                         type: 'motorbike',
                       })

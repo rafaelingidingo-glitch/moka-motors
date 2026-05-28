@@ -17,7 +17,7 @@ interface Motorbike {
   mileage: string | null
   color: string | null
   description: string
-  imageUrl: string
+  images: string
   featured: boolean
   isNewStock: boolean
   createdAt?: string

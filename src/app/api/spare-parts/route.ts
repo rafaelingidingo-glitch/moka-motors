@@ -57,6 +57,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    const images = Array.isArray(body.images) ? JSON.stringify(body.images) : (typeof body.images === 'string' ? body.images : '[]')
+
     const sparePart = await db.sparePart.create({
       data: {
         name: body.name,
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
         compatibility: body.compatibility,
         price: parseFloat(body.price),
         description: body.description,
-        imageUrl: body.imageUrl,
+        images,
         inStock: body.inStock !== undefined ? body.inStock : true,
         featured: body.featured || false,
       },

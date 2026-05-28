@@ -8,19 +8,24 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
+
+    const data: Record<string, unknown> = {}
+
+    if (body.name !== undefined) data.name = body.name
+    if (body.type !== undefined) data.type = body.type
+    if (body.brand !== undefined) data.brand = body.brand
+    if (body.compatibility !== undefined) data.compatibility = body.compatibility
+    if (body.price !== undefined) data.price = parseFloat(String(body.price))
+    if (body.description !== undefined) data.description = body.description
+    if (body.images !== undefined) {
+      data.images = Array.isArray(body.images) ? JSON.stringify(body.images) : body.images
+    }
+    if (body.inStock !== undefined) data.inStock = body.inStock
+    if (body.featured !== undefined) data.featured = body.featured
+
     const sparePart = await db.sparePart.update({
       where: { id },
-      data: {
-        name: body.name,
-        type: body.type,
-        brand: body.brand,
-        compatibility: body.compatibility,
-        price: body.price !== undefined ? parseFloat(String(body.price)) : undefined,
-        description: body.description,
-        imageUrl: body.imageUrl,
-        inStock: body.inStock,
-        featured: body.featured,
-      },
+      data,
     })
     return NextResponse.json(sparePart)
   } catch (error) {

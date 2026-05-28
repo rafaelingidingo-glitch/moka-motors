@@ -6,7 +6,6 @@ import { SlidersHorizontal, ArrowUpDown, Wrench } from 'lucide-react'
 import SparePartCard from './SparePartCard'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 
@@ -18,7 +17,7 @@ interface SparePart {
   compatibility: string
   price: number
   description: string
-  imageUrl: string
+  images: string
   inStock: boolean
   featured: boolean
 }
@@ -247,23 +246,58 @@ export default function SparePartsInventory() {
           )}
         </button>
         {expandedSections.price && (
-          <div className="mt-2 px-1">
-            <p className="text-xs text-[#DC2626] font-semibold mb-2">
+          <div className="mt-2 px-1 space-y-3">
+            <p className="text-xs text-[#DC2626] font-semibold">
               Range: TZS {filters.priceRange[0].toLocaleString()} - TZS {filters.priceRange[1].toLocaleString()}
             </p>
-            <Slider
-              value={filters.priceRange}
-              min={0}
-              max={600000}
-              step={25000}
-              onValueChange={(value) =>
-                setFilters({ ...filters, priceRange: value as [number, number] })
-              }
-              className="mt-4"
-            />
-            <div className="flex items-center justify-between mt-2 text-xs text-gray-400">
-              <span>TZS {filters.priceRange[0].toLocaleString()}</span>
-              <span>TZS {filters.priceRange[1].toLocaleString()}</span>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
+                  Min Price
+                </label>
+                <div className="relative">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">TZS</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={600000}
+                    value={filters.priceRange[0] || ''}
+                    onChange={(e) => {
+                      const val = e.target.value === '' ? 0 : Number(e.target.value)
+                      if (!isNaN(val) && val >= 0) {
+                        setFilters({ ...filters, priceRange: [val, filters.priceRange[1]] })
+                        setShowCount(6)
+                      }
+                    }}
+                    placeholder="0"
+                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
+              <span className="text-gray-300 mt-5">—</span>
+              <div className="flex-1">
+                <label className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
+                  Max Price
+                </label>
+                <div className="relative">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">TZS</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={600000}
+                    value={filters.priceRange[1] || ''}
+                    onChange={(e) => {
+                      const val = e.target.value === '' ? 600000 : Number(e.target.value)
+                      if (!isNaN(val) && val >= 0) {
+                        setFilters({ ...filters, priceRange: [filters.priceRange[0], val] })
+                        setShowCount(6)
+                      }
+                    }}
+                    placeholder="600,000"
+                    className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}
