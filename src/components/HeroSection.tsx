@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ChevronDown, ArrowRight, Play } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 export default function HeroSection() {
   const scrollToInventory = () => {
@@ -107,25 +107,6 @@ export default function HeroSection() {
           </motion.div>
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.0, duration: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-      >
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="text-white/40 cursor-pointer hover:text-white/60 transition-colors"
-          onClick={() =>
-            document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' })
-          }
-        >
-          <ChevronDown className="h-8 w-8" />
-        </motion.div>
-      </motion.div>
 
       {/* Side text */}
       <div className="absolute right-8 top-1/2 -translate-y-1/2 z-10 hidden xl:block">
