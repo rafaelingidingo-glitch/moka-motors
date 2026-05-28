@@ -112,7 +112,7 @@ export default function HeroSection() {
       <div className="absolute right-8 top-1/2 -translate-y-1/2 z-10 hidden xl:block">
         <img
           src="/images/logo.jpg"
-          alt="Sky Motors"
+          alt="Moka Motors"
           className="h-20 w-auto object-contain rounded-sm opacity-30"
         />
       </div>

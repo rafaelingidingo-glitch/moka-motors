@@ -9,6 +9,7 @@ import {
 import { useCartStore } from '@/store/cartStore'
 import { useLikeStore } from '@/store/likeStore'
 import { getProductInquiryMessage, getWhatsAppUrl } from '@/lib/whatsapp'
+import { parseImages } from '@/lib/utils'
 import {
   ShoppingCart,
   Calendar,
@@ -54,16 +55,6 @@ interface SparePartData {
 }
 
 type ProductData = MotorbikeData | SparePartData
-
-function parseImages(images: string): string[] {
-  try {
-    const parsed = JSON.parse(images)
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed
-    return []
-  } catch {
-    return []
-  }
-}
 
 function isMotorbike(product: ProductData): product is MotorbikeData {
   return 'engineSize' in product

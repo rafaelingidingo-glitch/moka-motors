@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 import { existsSync } from 'fs'
+import { requireAdmin } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
+  // Auth check — only admins can upload files
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File | null

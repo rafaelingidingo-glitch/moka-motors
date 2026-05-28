@@ -21,7 +21,7 @@ export default function Footer() {
             <div className="flex items-center gap-3 mb-4">
               <img
                 src="/images/logo.jpg"
-                alt="Sky Motors Logo"
+                alt="Moka Motors Logo"
                 className="h-14 w-auto object-contain rounded-sm"
               />
             </div>
@@ -180,7 +180,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <p className="text-gray-600 text-sm italic">
-                Sky Motors — Kariakoo, Dar es Salaam
+                Moka Motors — Kariakoo, Dar es Salaam
               </p>
               <button
                 onClick={scrollToTop}

@@ -62,7 +62,7 @@ export default function Navbar() {
             >
               <img
                 src="/images/logo.jpg"
-                alt="Sky Motors Logo"
+                alt="Moka Motors Logo"
                 className="h-10 md:h-12 w-auto object-contain rounded-sm"
               />
             </a>

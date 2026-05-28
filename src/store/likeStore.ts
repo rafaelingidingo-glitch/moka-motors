@@ -1,32 +1,29 @@
 import { create } from 'zustand'
 
 interface LikeState {
-  likedItems: Set<string>
+  likedIds: string[]
   toggleLike: (id: string) => void
   isLiked: (id: string) => boolean
   getLikedCount: () => number
 }
 
 export const useLikeStore = create<LikeState>((set, get) => ({
-  likedItems: new Set<string>(),
+  likedIds: [],
 
   toggleLike: (id) => {
     set((state) => {
-      const newSet = new Set(state.likedItems)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
+      if (state.likedIds.includes(id)) {
+        return { likedIds: state.likedIds.filter((i) => i !== id) }
       }
-      return { likedItems: newSet }
+      return { likedIds: [...state.likedIds, id] }
     })
   },
 
   isLiked: (id) => {
-    return get().likedItems.has(id)
+    return get().likedIds.includes(id)
   },
 
   getLikedCount: () => {
-    return get().likedItems.size
+    return get().likedIds.length
   },
 }))

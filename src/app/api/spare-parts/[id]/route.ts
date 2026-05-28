@@ -1,10 +1,15 @@
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/auth'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Auth check
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const { id } = await params
     const body = await request.json()
@@ -38,6 +43,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Auth check
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const { id } = await params
     await db.sparePart.delete({ where: { id } })

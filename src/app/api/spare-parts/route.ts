@@ -1,5 +1,6 @@
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,8 +56,18 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // Auth check
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   try {
     const body = await request.json()
+
+    // Validate required fields
+    if (!body.name || !body.type || !body.brand || !body.compatibility || !body.price || !body.description) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
     const images = Array.isArray(body.images) ? JSON.stringify(body.images) : (typeof body.images === 'string' ? body.images : '[]')
 
     const sparePart = await db.sparePart.create({

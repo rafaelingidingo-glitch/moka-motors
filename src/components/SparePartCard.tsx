@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useCartStore } from '@/store/cartStore'
 import { useLikeStore } from '@/store/likeStore'
 import { getProductInquiryMessage, getWhatsAppUrl } from '@/lib/whatsapp'
+import { parseImages } from '@/lib/utils'
 import { ShoppingCart, Star, Settings, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import ProductDetailModal from './ProductDetailModal'
@@ -19,16 +20,6 @@ interface SparePart {
   images: string
   inStock: boolean
   featured: boolean
-}
-
-function parseImages(images: string): string[] {
-  try {
-    const parsed = JSON.parse(images)
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed
-    return []
-  } catch {
-    return []
-  }
 }
 
 export default function SparePartCard({ part }: { part: SparePart }) {

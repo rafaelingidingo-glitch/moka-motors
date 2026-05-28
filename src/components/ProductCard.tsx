@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useCartStore } from '@/store/cartStore'
 import { useLikeStore } from '@/store/likeStore'
 import { getProductInquiryMessage, getWhatsAppUrl } from '@/lib/whatsapp'
+import { parseImages } from '@/lib/utils'
 import { ShoppingCart, Star, Gauge, Calendar, Cog, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import ProductDetailModal from './ProductDetailModal'
@@ -22,16 +23,6 @@ interface Motorbike {
   images: string
   featured: boolean
   isNewStock: boolean
-}
-
-function parseImages(images: string): string[] {
-  try {
-    const parsed = JSON.parse(images)
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed
-    return []
-  } catch {
-    return []
-  }
 }
 
 export default function ProductCard({ bike }: { bike: Motorbike }) {

@@ -30,17 +30,8 @@ import {
   PlusCircle,
 } from 'lucide-react'
 import { useAdminStore } from '@/store/adminStore'
+import { parseImages } from '@/lib/utils'
 import { toast } from 'sonner'
-
-function parseImages(images: string): string[] {
-  try {
-    const parsed = JSON.parse(images)
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed
-    return []
-  } catch {
-    return []
-  }
-}
 
 interface Motorbike {
   id: string
@@ -107,25 +98,35 @@ export default function AdminPage() {
   })
 
   const fetchMotorbikes = async () => {
-    const res = await fetch('/api/motorbikes')
-    const data = await res.json()
-    setMotorbikes(data)
+    try {
+      const res = await fetch('/api/motorbikes', { credentials: 'include' })
+      if (!res.ok) throw new Error('Failed to fetch')
+      const data = await res.json()
+      setMotorbikes(data)
+    } catch (err) {
+      console.error('Failed to fetch motorbikes:', err)
+    }
   }
 
   const fetchSpareParts = async () => {
-    const res = await fetch('/api/spare-parts')
-    const data = await res.json()
-    setSpareParts(data)
+    try {
+      const res = await fetch('/api/spare-parts', { credentials: 'include' })
+      if (!res.ok) throw new Error('Failed to fetch')
+      const data = await res.json()
+      setSpareParts(data)
+    } catch (err) {
+      console.error('Failed to fetch spare parts:', err)
+    }
   }
 
   useEffect(() => {
     if (isLoggedIn) {
-      fetch('/api/motorbikes')
-        .then((res) => res.json())
+      fetch('/api/motorbikes', { credentials: 'include' })
+        .then((res) => { if (!res.ok) throw new Error(); return res.json() })
         .then((data) => setMotorbikes(data))
         .catch(console.error)
-      fetch('/api/spare-parts')
-        .then((res) => res.json())
+      fetch('/api/spare-parts', { credentials: 'include' })
+        .then((res) => { if (!res.ok) throw new Error(); return res.json() })
         .then((data) => setSpareParts(data))
         .catch(console.error)
     }
@@ -138,6 +139,7 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ username, password }),
       })
       const data = await res.json()
@@ -153,7 +155,9 @@ export default function AdminPage() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Clear the admin cookie by calling a logout or setting it client-side
+    document.cookie = 'admin_logged_in=; path=/; max-age=0'
     logout()
     setTab('dashboard')
     setUsername('')
@@ -247,6 +251,7 @@ export default function AdminPage() {
         await fetch(`/api/motorbikes/${editingItem.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(payload),
         })
         toast.success('Motorbike updated!')
@@ -254,6 +259,7 @@ export default function AdminPage() {
         await fetch('/api/motorbikes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(payload),
         })
         toast.success('Motorbike added!')
@@ -283,6 +289,7 @@ export default function AdminPage() {
         await fetch(`/api/spare-parts/${editingItem.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(payload),
         })
         toast.success('Spare part updated!')
@@ -290,6 +297,7 @@ export default function AdminPage() {
         await fetch('/api/spare-parts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(payload),
         })
         toast.success('Spare part added!')
@@ -304,7 +312,7 @@ export default function AdminPage() {
   const handleDeleteMotorbike = async (id: string) => {
     if (!confirm('Are you sure you want to delete this motorbike?')) return
     try {
-      await fetch(`/api/motorbikes/${id}`, { method: 'DELETE' })
+      await fetch(`/api/motorbikes/${id}`, { method: 'DELETE', credentials: 'include' })
       toast.success('Motorbike deleted!')
       fetchMotorbikes()
     } catch {
@@ -315,7 +323,7 @@ export default function AdminPage() {
   const handleDeleteSparePart = async (id: string) => {
     if (!confirm('Are you sure you want to delete this spare part?')) return
     try {
-      await fetch(`/api/spare-parts/${id}`, { method: 'DELETE' })
+      await fetch(`/api/spare-parts/${id}`, { method: 'DELETE', credentials: 'include' })
       toast.success('Spare part deleted!')
       fetchSpareParts()
     } catch {
@@ -333,6 +341,7 @@ export default function AdminPage() {
         await fetch(`/api/motorbikes/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ featured: !current }),
         })
         fetchMotorbikes()
@@ -340,6 +349,7 @@ export default function AdminPage() {
         await fetch(`/api/spare-parts/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ featured: !current }),
         })
         fetchSpareParts()
@@ -355,6 +365,7 @@ export default function AdminPage() {
       await fetch(`/api/motorbikes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ isNewStock: !current }),
       })
       fetchMotorbikes()
@@ -369,6 +380,7 @@ export default function AdminPage() {
       await fetch(`/api/spare-parts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ inStock: !current }),
       })
       fetchSpareParts()
@@ -395,6 +407,7 @@ export default function AdminPage() {
       formData.append('file', file)
       const res = await fetch('/api/upload', {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       })
       const data = await res.json()
@@ -452,7 +465,7 @@ export default function AdminPage() {
         <div className="absolute top-6 right-6">
           <img
             src="/images/logo.jpg"
-            alt="Sky Motors Logo"
+            alt="Moka Motors Logo"
             className="h-10 w-auto object-contain rounded-sm"
           />
         </div>
@@ -557,13 +570,13 @@ export default function AdminPage() {
           {sidebarOpen ? (
             <img
               src="/images/logo.jpg"
-              alt="Sky Motors Logo"
+              alt="Moka Motors Logo"
               className="h-10 w-auto object-contain rounded-sm"
             />
           ) : (
             <img
               src="/images/logo.jpg"
-              alt="Sky Motors Logo"
+              alt="Moka Motors Logo"
               className="h-8 w-8 object-contain rounded-sm"
             />
           )}

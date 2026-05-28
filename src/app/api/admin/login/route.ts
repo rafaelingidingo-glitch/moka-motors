@@ -24,10 +24,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       username: admin.username,
     })
+
+    // Set an httpOnly admin session cookie (7 days)
+    response.cookies.set('admin_logged_in', 'true', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+    })
+
+    return response
   } catch (error) {
     console.error('Error during login:', error)
     return NextResponse.json({ error: 'Login failed' }, { status: 500 })
