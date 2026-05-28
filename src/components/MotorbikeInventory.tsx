@@ -34,7 +34,7 @@ interface FilterState {
 const defaultFilters: FilterState = {
   brands: [],
   categories: [],
-  priceRange: [0, 25000000],
+  priceRange: [0, Infinity],
   year: '',
   engineSize: '',
 }

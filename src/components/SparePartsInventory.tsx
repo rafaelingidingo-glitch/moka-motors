@@ -44,7 +44,7 @@ const partBrands = ['Honda', 'Yamaha', 'Kawasaki', 'KTM', 'Universal']
 const defaultFilters: PartFilterState = {
   types: [],
   brands: [],
-  priceRange: [0, 600000],
+  priceRange: [0, Infinity],
   inStockOnly: false,
 }
 
@@ -125,7 +125,7 @@ export default function SparePartsInventory() {
   const activeFilterCount =
     filters.types.length +
     filters.brands.length +
-    (filters.priceRange[0] > 0 || filters.priceRange[1] < 600000 ? 1 : 0) +
+    (filters.priceRange[0] > 0 || isFinite(filters.priceRange[1]) ? 1 : 0) +
     (filters.inStockOnly ? 1 : 0)
 
   const filterContent = (
@@ -248,7 +248,7 @@ export default function SparePartsInventory() {
         {expandedSections.price && (
           <div className="mt-2 px-1 space-y-3">
             <p className="text-xs text-[#DC2626] font-semibold">
-              Range: TZS {filters.priceRange[0].toLocaleString()} - TZS {filters.priceRange[1].toLocaleString()}
+              Range: TZS {filters.priceRange[0].toLocaleString()} — {isFinite(filters.priceRange[1]) ? `TZS ${filters.priceRange[1].toLocaleString()}` : 'No Limit'}
             </p>
             <div className="flex items-center gap-2">
               <div className="flex-1">
@@ -260,7 +260,6 @@ export default function SparePartsInventory() {
                   <input
                     type="number"
                     min={0}
-                    max={600000}
                     value={filters.priceRange[0] || ''}
                     onChange={(e) => {
                       const val = e.target.value === '' ? 0 : Number(e.target.value)
@@ -284,16 +283,15 @@ export default function SparePartsInventory() {
                   <input
                     type="number"
                     min={0}
-                    max={600000}
-                    value={filters.priceRange[1] || ''}
+                    value={isFinite(filters.priceRange[1]) ? filters.priceRange[1] || '' : ''}
                     onChange={(e) => {
-                      const val = e.target.value === '' ? 600000 : Number(e.target.value)
-                      if (!isNaN(val) && val >= 0) {
+                      const val = e.target.value === '' ? Infinity : Number(e.target.value)
+                      if (!isNaN(val) && (val === Infinity || val >= 0)) {
                         setFilters({ ...filters, priceRange: [filters.priceRange[0], val] })
                         setShowCount(6)
                       }
                     }}
-                    placeholder="600,000"
+                    placeholder="No limit"
                     className="w-full pl-11 pr-2 py-2 text-sm border border-gray-200 rounded-sm focus:outline-none focus:border-[#DC2626] focus:ring-1 focus:ring-[#DC2626]/20 bg-white text-[#111111] font-medium [appearance-none] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
