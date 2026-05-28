@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Motorbike {
+  id          String   @id @default(cuid())
+  name        String
+  brand       String
+  category    String
+  price       Float
+  year        Int
+  engineSize  String
+  mileage     String?
+  color       String?
+  description String
+  imageUrl    String
+  featured    Boolean  @default(false)
+  isNewStock  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SparePart {
+  id            String   @id @default(cuid())
+  name          String
+  type          String
+  brand         String
+  compatibility String
+  price         Float
+  description   String
+  imageUrl      String
+  inStock       Boolean  @default(true)
+  featured      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+}
