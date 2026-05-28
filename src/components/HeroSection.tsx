@@ -35,23 +35,10 @@ export default function HeroSection() {
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-32">
         <div className="max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <div className="inline-flex items-center gap-2 bg-[#DC2626]/20 border border-[#DC2626]/30 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-              <div className="w-2 h-2 bg-[#DC2626] rounded-full animate-pulse" />
-              <p className="text-[#DC2626] font-bold text-xs md:text-sm uppercase tracking-[0.2em]">
-                We are the solution for your problems 😀
-              </p>
-            </div>
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-[0.95] mb-6"
           >
             <span className="block">PREMIUM</span>
@@ -67,7 +54,7 @@ export default function HeroSection() {
           <motion.p
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             className="text-gray-300 text-base md:text-lg max-w-xl mb-10 leading-relaxed"
           >
             Your trusted destination for premium motorbikes and genuine spare parts.
@@ -78,7 +65,7 @@ export default function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4"
           >
             <button
@@ -100,7 +87,7 @@ export default function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
             className="flex items-center gap-8 mt-12 pt-8 border-t border-white/10"
           >
             <div>
@@ -125,7 +112,7 @@ export default function HeroSection() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
+        transition={{ delay: 1.0, duration: 1 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
       >
         <motion.div
