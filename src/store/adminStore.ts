@@ -2,19 +2,27 @@ import { create } from 'zustand'
 
 interface AdminState {
   isLoggedIn: boolean
-  isAdminPanelOpen: boolean
+  isPanelOpen: boolean
+  showAdminPage: boolean
   login: () => void
   logout: () => void
-  setAdminPanelOpen: (open: boolean) => void
+  setPanelOpen: (open: boolean) => void
+  openAdminPage: () => void
+  closeAdminPage: () => void
 }
 
 export const useAdminStore = create<AdminState>((set) => ({
   isLoggedIn: false,
-  isAdminPanelOpen: false,
+  isPanelOpen: false,
+  showAdminPage: false,
 
   login: () => set({ isLoggedIn: true }),
 
-  logout: () => set({ isLoggedIn: false, isAdminPanelOpen: false }),
+  logout: () => set({ isLoggedIn: false, isPanelOpen: false, showAdminPage: false }),
 
-  setAdminPanelOpen: (open) => set({ isAdminPanelOpen: open }),
+  setPanelOpen: (open) => set({ isPanelOpen: open }),
+
+  openAdminPage: () => set({ showAdminPage: true }),
+
+  closeAdminPage: () => set({ showAdminPage: false }),
 }))

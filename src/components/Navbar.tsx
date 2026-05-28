@@ -19,7 +19,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { getItemCount, toggleCart } = useCartStore()
-  const { isLoggedIn, setAdminPanelOpen } = useAdminStore()
+  const { isLoggedIn, openAdminPage } = useAdminStore()
   const itemCount = getItemCount()
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function Navbar() {
 
               {/* Admin Login */}
               <button
-                onClick={() => setAdminPanelOpen(true)}
+                onClick={openAdminPage}
                 className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
                   isLoggedIn
                     ? 'bg-[#DC2626] text-white'
@@ -171,12 +171,12 @@ export default function Navbar() {
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false)
-                      setAdminPanelOpen(true)
+                      openAdminPage()
                     }}
                     className="flex items-center gap-2 text-gray-300 hover:text-white px-4 py-3 rounded-md text-base font-medium transition-all duration-200 w-full"
                   >
                     <User className="h-5 w-5" />
-                    {isLoggedIn ? 'Admin Panel' : 'Admin Login'}
+                    {isLoggedIn ? 'Admin Dashboard' : 'Admin Login'}
                   </button>
                 </div>
               </div>
