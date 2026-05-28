@@ -22,6 +22,11 @@ import {
   Settings,
   Bell,
   Star,
+  Upload,
+  Image as ImageIcon,
+  X,
+  Link,
+  Loader2,
 } from 'lucide-react'
 import { useAdminStore } from '@/store/adminStore'
 import { toast } from 'sonner'
@@ -70,6 +75,9 @@ export default function AdminPage() {
   const [showForm, setShowForm] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload')
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null)
 
   // Form state
   const [form, setForm] = useState<Record<string, string>>({
@@ -160,12 +168,16 @@ export default function AdminPage() {
     setEditingItem(null)
     setIsAdding(false)
     setShowForm(false)
+    setUploadPreview(null)
+    setImageMode('upload')
   }
 
   const handleEditMotorbike = (bike: Motorbike) => {
     setEditingItem(bike)
     setIsAdding(false)
     setShowForm(true)
+    setUploadPreview(null)
+    setImageMode(bike.imageUrl.startsWith('/uploads/') ? 'upload' : 'url')
     setForm({
       name: bike.name,
       brand: bike.brand,
@@ -186,6 +198,8 @@ export default function AdminPage() {
     setEditingItem(part)
     setIsAdding(false)
     setShowForm(true)
+    setUploadPreview(null)
+    setImageMode(part.imageUrl.startsWith('/uploads/') ? 'upload' : 'url')
     setForm({
       name: part.name,
       brand: part.brand,
@@ -607,7 +621,7 @@ export default function AdminPage() {
                   <h3 className="text-white font-bold text-lg mb-4">Quick Actions</h3>
                   <div className="space-y-3">
                     <button
-                      onClick={() => { setTab('motorbikes'); setIsAdding(true); setShowForm(true) }}
+                      onClick={() => { setTab('motorbikes'); setIsAdding(true); setShowForm(true); setUploadPreview(null); setImageMode('upload') }}
                       className="w-full flex items-center gap-3 bg-[#111111] hover:bg-[#DC2626]/10 border border-gray-700 hover:border-[#DC2626]/30 rounded-md p-3 transition-all text-left group"
                     >
                       <div className="bg-[#DC2626]/10 group-hover:bg-[#DC2626]/20 p-2 rounded-md transition-colors">
@@ -620,7 +634,7 @@ export default function AdminPage() {
                       <ChevronRight className="h-4 w-4 text-gray-600 ml-auto" />
                     </button>
                     <button
-                      onClick={() => { setTab('spare-parts'); setIsAdding(true); setShowForm(true) }}
+                      onClick={() => { setTab('spare-parts'); setIsAdding(true); setShowForm(true); setUploadPreview(null); setImageMode('upload') }}
                       className="w-full flex items-center gap-3 bg-[#111111] hover:bg-[#DC2626]/10 border border-gray-700 hover:border-[#DC2626]/30 rounded-md p-3 transition-all text-left group"
                     >
                       <div className="bg-[#DC2626]/10 group-hover:bg-[#DC2626]/20 p-2 rounded-md transition-colors">
@@ -1105,14 +1119,163 @@ export default function AdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">Image URL</label>
-                    <input
-                      type="text"
-                      value={form.imageUrl}
-                      onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                      className="w-full px-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
-                      placeholder="/images/bike-xxx.png"
-                    />
+                    <label className="block text-sm font-semibold text-gray-300 mb-3">Product Image</label>
+                    
+                    {/* Mode Toggle */}
+                    <div className="flex gap-1 mb-4 bg-[#111111] rounded-md p-1 border border-gray-700">
+                      <button
+                        type="button"
+                        onClick={() => setImageMode('upload')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2 rounded text-sm font-semibold transition-all ${
+                          imageMode === 'upload'
+                            ? 'bg-[#DC2626] text-white shadow'
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        <Upload className="h-4 w-4" />
+                        Upload File
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImageMode('url')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2 rounded text-sm font-semibold transition-all ${
+                          imageMode === 'url'
+                            ? 'bg-[#DC2626] text-white shadow'
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        <Link className="h-4 w-4" />
+                        Image URL
+                      </button>
+                    </div>
+
+                    {/* Upload Mode */}
+                    {imageMode === 'upload' && (
+                      <div>
+                        <label
+                          htmlFor="image-upload"
+                          className={`relative flex flex-col items-center justify-center w-full h-44 border-2 border-dashed rounded-md cursor-pointer transition-all ${
+                            isUploading
+                              ? 'border-[#DC2626]/50 bg-[#DC2626]/5'
+                              : uploadPreview || form.imageUrl
+                                ? 'border-green-500/30 bg-green-500/5'
+                                : 'border-gray-700 bg-[#111111] hover:border-[#DC2626]/50 hover:bg-[#DC2626]/5'
+                          }`}
+                        >
+                          {isUploading ? (
+                            <div className="flex flex-col items-center">
+                              <Loader2 className="h-8 w-8 text-[#DC2626] animate-spin mb-2" />
+                              <p className="text-gray-400 text-sm">Uploading...</p>
+                            </div>
+                          ) : uploadPreview || form.imageUrl ? (
+                            <div className="relative w-full h-full p-2">
+                              <img
+                                src={uploadPreview || form.imageUrl}
+                                alt="Preview"
+                                className="w-full h-full object-contain rounded"
+                              />
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  setUploadPreview(null)
+                                  setForm({ ...form, imageUrl: '' })
+                                }}
+                                className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full transition-colors"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                              <div className="absolute bottom-3 left-3 bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1">
+                                <ImageIcon className="h-3 w-3" />
+                                Image uploaded
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center">
+                              <Upload className="h-8 w-8 text-gray-500 mb-2" />
+                              <p className="text-gray-300 text-sm font-medium">Click to upload image</p>
+                              <p className="text-gray-600 text-xs mt-1">JPEG, PNG, GIF, WebP, SVG (max 5MB)</p>
+                            </div>
+                          )}
+                          <input
+                            id="image-upload"
+                            type="file"
+                            accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0]
+                              if (!file) return
+
+                              // Validate size
+                              if (file.size > 5 * 1024 * 1024) {
+                                toast.error('File too large. Maximum size is 5MB.')
+                                return
+                              }
+
+                              // Show preview immediately
+                              const reader = new FileReader()
+                              reader.onload = (ev) => {
+                                setUploadPreview(ev.target?.result as string)
+                              }
+                              reader.readAsDataURL(file)
+
+                              // Upload to server
+                              setIsUploading(true)
+                              try {
+                                const formData = new FormData()
+                                formData.append('file', file)
+                                const res = await fetch('/api/upload', {
+                                  method: 'POST',
+                                  body: formData,
+                                })
+                                const data = await res.json()
+                                if (data.success) {
+                                  setForm({ ...form, imageUrl: data.url })
+                                  toast.success('Image uploaded successfully!')
+                                } else {
+                                  toast.error(data.error || 'Upload failed')
+                                  setUploadPreview(null)
+                                }
+                              } catch {
+                                toast.error('Upload failed. Please try again.')
+                                setUploadPreview(null)
+                              } finally {
+                                setIsUploading(false)
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+                    )}
+
+                    {/* URL Mode */}
+                    {imageMode === 'url' && (
+                      <div className="space-y-3">
+                        <div className="relative">
+                          <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                          <input
+                            type="text"
+                            value={form.imageUrl}
+                            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                            className="w-full pl-10 pr-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 focus:border-[#DC2626] transition-all"
+                            placeholder="https://example.com/image.png or /images/bike.png"
+                          />
+                        </div>
+                        {form.imageUrl && (
+                          <div className="relative bg-[#111111] border border-gray-700 rounded-md p-3 h-32">
+                            <img
+                              src={form.imageUrl}
+                              alt="Preview"
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none'
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-4 pt-4">
                     <button
