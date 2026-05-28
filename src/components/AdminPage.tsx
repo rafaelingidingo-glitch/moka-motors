@@ -33,6 +33,7 @@ import {
   KeyRound,
   UserPlus,
   Check,
+  Menu,
 } from 'lucide-react'
 import { useAdminStore } from '@/store/adminStore'
 import { useTranslation } from '@/lib/i18n'
@@ -82,7 +83,7 @@ export default function AdminPage() {
   const [editingItem, setEditingItem] = useState<Motorbike | SparePart | null>(null)
   const [isAdding, setIsAdding] = useState(false)
   const [showForm, setShowForm] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const [imageList, setImageList] = useState<string[]>([])
@@ -707,8 +708,24 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] flex">
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-[#111111] border-r border-gray-800 flex flex-col transition-all duration-300 shrink-0`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[#111111] border-r border-gray-800 flex flex-col transition-transform duration-300 ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-20'
+      }`}>
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-800">
           {sidebarOpen ? (
@@ -721,23 +738,29 @@ export default function AdminPage() {
             <img
               src="/images/logo.jpg"
               alt="Moka Motors Logo"
-              className="h-8 w-8 object-contain rounded-sm"
+              className="h-8 w-8 object-contain rounded-sm hidden lg:block"
             />
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="text-gray-500 hover:text-white p-1.5 rounded hover:bg-white/5 transition-colors"
           >
-            <ChevronRight className={`h-4 w-4 transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} />
+            <X className="h-5 w-5 lg:hidden" />
+            <ChevronRight className={`h-4 w-4 hidden lg:block transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} />
           </button>
         </div>
 
         {/* Nav Items */}
-        <nav className="flex-1 py-4 px-3 space-y-1">
+        <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
           {sidebarItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => { setTab(item.id); resetForm() }}
+              onClick={() => {
+                setTab(item.id)
+                resetForm()
+                // Only close sidebar on mobile (overlay mode)
+                if (window.innerWidth < 1024) setSidebarOpen(false)
+              }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all ${
                 tab === item.id
                   ? 'bg-[#DC2626] text-white shadow-lg shadow-[#DC2626]/20'
@@ -772,47 +795,49 @@ export default function AdminPage() {
       {/* Main Content */}
       <main className="flex-1 min-w-0 flex flex-col">
         {/* Top Bar */}
-        <header className="h-16 bg-[#111111] border-b border-gray-800 flex items-center justify-between px-6 shrink-0">
-          <div>
-            <h1 className="text-white font-bold text-lg">
+        <header className="h-14 md:h-16 bg-[#111111] border-b border-gray-800 flex items-center justify-between px-3 md:px-6 shrink-0 gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-gray-400 hover:text-white p-1.5 rounded-md hover:bg-white/5 transition-colors shrink-0"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <h1 className="text-white font-bold text-sm md:text-lg truncate">
               {tab === 'dashboard' && t('admin.dashboard')}
               {tab === 'motorbikes' && t('admin.motorbikesMgmt')}
               {tab === 'spare-parts' && t('admin.sparePartsMgmt')}
               {tab === 'settings' && t('admin.settings')}
             </h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4 shrink-0">
             {(tab === 'motorbikes' || tab === 'spare-parts') && (
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder={t('admin.search') || 'Search...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-[#1A1A1A] border border-gray-700 rounded-md pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#DC2626] transition-colors w-48 md:w-64"
+                  className="bg-[#1A1A1A] border border-gray-700 rounded-md pl-10 pr-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#DC2626] transition-colors w-32 sm:w-48 md:w-64"
                 />
               </div>
             )}
+            <button className="relative text-gray-400 hover:text-white p-2 rounded-md hover:bg-white/5 transition-colors hidden sm:block">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-[#DC2626] rounded-full" />
+            </button>
             <div className="flex items-center gap-2">
-              <button className="relative text-gray-400 hover:text-white p-2 rounded-md hover:bg-white/5 transition-colors">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-[#DC2626] rounded-full" />
-              </button>
-              <div className="flex items-center gap-2 ml-2">
-                <div className="w-8 h-8 bg-[#DC2626] rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">{currentAdmin?.username?.charAt(0).toUpperCase() || 'A'}</span>
-                </div>
-                {sidebarOpen !== false && (
-                  <span className="text-gray-300 text-sm font-medium hidden md:block">{currentAdmin?.username || 'Admin'}</span>
-                )}
+              <div className="w-8 h-8 bg-[#DC2626] rounded-full flex items-center justify-center shrink-0">
+                <span className="text-white text-xs font-bold">{currentAdmin?.username?.charAt(0).toUpperCase() || 'A'}</span>
               </div>
+              <span className="text-gray-300 text-sm font-medium hidden md:block">{currentAdmin?.username || 'Admin'}</span>
             </div>
           </div>
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-3 md:p-6">
           {/* ===== DASHBOARD TAB ===== */}
           {tab === 'dashboard' && (
             <div className="space-y-6">
@@ -837,8 +862,8 @@ export default function AdminPage() {
               </div>
 
               {/* Quick Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-4 md:p-6">
                   <h3 className="text-white font-bold text-lg mb-4">{t('admin.quickActions')}</h3>
                   <div className="space-y-3">
                     <button
@@ -871,31 +896,31 @@ export default function AdminPage() {
                 </div>
 
                 {/* Recent Activity */}
-                <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6">
+                <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-4 md:p-6">
                   <h3 className="text-white font-bold text-lg mb-4">{t('admin.inventoryOverview')}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-gray-400 text-sm">Motorbikes</span>
-                      <div className="flex items-center gap-3">
-                        <div className="w-32 h-2 bg-gray-800 rounded-full overflow-hidden">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-16 sm:w-32 h-2 bg-gray-800 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-[#DC2626] rounded-full"
                             style={{ width: `${motorbikes.length > 0 ? (motorbikes.length / totalProducts) * 100 : 0}%` }}
                           />
                         </div>
-                        <span className="text-white text-sm font-bold w-8 text-right">{motorbikes.length}</span>
+                        <span className="text-white text-sm font-bold w-6 sm:w-8 text-right">{motorbikes.length}</span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-gray-400 text-sm">Spare Parts</span>
-                      <div className="flex items-center gap-3">
-                        <div className="w-32 h-2 bg-gray-800 rounded-full overflow-hidden">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-16 sm:w-32 h-2 bg-gray-800 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-orange-500 rounded-full"
                             style={{ width: `${spareParts.length > 0 ? (spareParts.length / totalProducts) * 100 : 0}%` }}
                           />
                         </div>
-                        <span className="text-white text-sm font-bold w-8 text-right">{spareParts.length}</span>
+                        <span className="text-white text-sm font-bold w-6 sm:w-8 text-right">{spareParts.length}</span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
@@ -942,22 +967,21 @@ export default function AdminPage() {
           {/* ===== MOTORBIKES TAB ===== */}
           {tab === 'motorbikes' && !showForm && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm">
-                    {filteredMotorbikes.length} motorbike{filteredMotorbikes.length !== 1 ? 's' : ''} found
-                  </p>
-                </div>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-gray-400 text-sm">
+                  {filteredMotorbikes.length} motorbike{filteredMotorbikes.length !== 1 ? 's' : ''} found
+                </p>
                 <button
                   onClick={() => {
                     resetForm()
                     setIsAdding(true)
                     setShowForm(true)
                   }}
-                  className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-5 py-2.5 rounded-md flex items-center gap-2 transition-colors shadow-lg shadow-[#DC2626]/20"
+                  className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-3 md:px-5 py-2.5 rounded-md flex items-center gap-2 transition-colors shadow-lg shadow-[#DC2626]/20 whitespace-nowrap"
                 >
                   <Plus className="h-4 w-4" />
-                  {t('admin.addMotorbike')}
+                  <span className="hidden sm:inline">{t('admin.addMotorbike')}</span>
+                  <span className="sm:hidden">Add</span>
                 </button>
               </div>
 
@@ -1074,22 +1098,21 @@ export default function AdminPage() {
           {/* ===== SPARE PARTS TAB ===== */}
           {tab === 'spare-parts' && !showForm && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm">
-                    {filteredSpareParts.length} spare part{filteredSpareParts.length !== 1 ? 's' : ''} found
-                  </p>
-                </div>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-gray-400 text-sm">
+                  {filteredSpareParts.length} spare part{filteredSpareParts.length !== 1 ? 's' : ''} found
+                </p>
                 <button
                   onClick={() => {
                     resetForm()
                     setIsAdding(true)
                     setShowForm(true)
                   }}
-                  className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-5 py-2.5 rounded-md flex items-center gap-2 transition-colors shadow-lg shadow-[#DC2626]/20"
+                  className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-3 md:px-5 py-2.5 rounded-md flex items-center gap-2 transition-colors shadow-lg shadow-[#DC2626]/20 whitespace-nowrap"
                 >
                   <Plus className="h-4 w-4" />
-                  {t('admin.addSparePart')}
+                  <span className="hidden sm:inline">{t('admin.addSparePart')}</span>
+                  <span className="sm:hidden">Add</span>
                 </button>
               </div>
 
@@ -1208,7 +1231,7 @@ export default function AdminPage() {
           {/* ===== FORM (Add/Edit) ===== */}
           {showForm && (tab === 'motorbikes' || tab === 'spare-parts') && (
             <div className="max-w-2xl">
-              <div className="mb-6">
+              <div className="mb-4 md:mb-6">
                 <button
                   onClick={resetForm}
                   className="text-gray-400 hover:text-white text-sm flex items-center gap-2 transition-colors"
@@ -1217,7 +1240,7 @@ export default function AdminPage() {
                   Back to list
                 </button>
               </div>
-              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
+              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-4 md:p-6 lg:p-8">
                 <h3 className="text-white font-bold text-xl mb-6">
                   {isAdding
                     ? tab === 'motorbikes'
@@ -1236,7 +1259,7 @@ export default function AdminPage() {
                       placeholder="Product name"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-300 mb-2">Brand *</label>
                       <select
@@ -1289,7 +1312,7 @@ export default function AdminPage() {
                       </div>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-300 mb-2">Price (TZS) *</label>
                       <input
@@ -1314,7 +1337,7 @@ export default function AdminPage() {
                     )}
                   </div>
                   {tab === 'motorbikes' && (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Engine Size *</label>
                         <input
@@ -1467,7 +1490,7 @@ export default function AdminPage() {
                     </p>
                   </div>
 
-                  <div className="flex gap-4 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
                     <button
                       onClick={tab === 'motorbikes' ? handleSaveMotorbike : handleSaveSparePart}
                       className="flex-1 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold py-3.5 rounded-md transition-colors shadow-lg shadow-[#DC2626]/20"
@@ -1488,10 +1511,10 @@ export default function AdminPage() {
 
           {/* ===== SETTINGS TAB ===== */}
           {tab === 'settings' && (
-            <div className="max-w-2xl space-y-6">
+            <div className="max-w-2xl space-y-4 md:space-y-6">
               {/* Account Information */}
-              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
-                <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
+              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-4 md:p-6 lg:p-8">
+                <h3 className="text-white font-bold text-lg mb-4 md:mb-6 flex items-center gap-2">
                   <Shield className="h-5 w-5 text-[#DC2626]" />
                   {t('admin.accountInfo')}
                 </h3>
@@ -1507,14 +1530,14 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.role')}</label>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                       <input
                         type="text"
                         value={currentAdmin?.role === 'super_admin' ? t('admin.superAdmin') : t('admin.adminRole')}
                         readOnly
                         className="flex-1 px-4 py-3 bg-[#111111] border border-gray-700 rounded-md text-gray-500 cursor-not-allowed"
                       />
-                      <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${
+                      <span className={`text-xs font-bold px-3 py-1.5 rounded-full text-center whitespace-nowrap self-start ${
                         currentAdmin?.role === 'super_admin'
                           ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
                           : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
@@ -1527,8 +1550,8 @@ export default function AdminPage() {
               </div>
 
               {/* Change Password */}
-              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
-                <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
+              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-4 md:p-6 lg:p-8">
+                <h3 className="text-white font-bold text-lg mb-4 md:mb-6 flex items-center gap-2">
                   <KeyRound className="h-5 w-5 text-[#DC2626]" />
                   {t('admin.changePassword')}
                 </h3>
@@ -1598,15 +1621,15 @@ export default function AdminPage() {
 
               {/* Manage Admins - Only visible to super_admin */}
               {currentAdmin?.role === 'super_admin' && (
-                <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-4 md:p-6 lg:p-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 md:mb-6">
                     <h3 className="text-white font-bold text-lg flex items-center gap-2">
                       <Users className="h-5 w-5 text-[#DC2626]" />
                       {t('admin.manageAdmins')}
                     </h3>
                     <button
                       onClick={() => setShowNewAdminForm(!showNewAdminForm)}
-                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
+                      className="bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold px-4 py-2 rounded-md flex items-center gap-2 transition-colors whitespace-nowrap self-start"
                     >
                       <UserPlus className="h-4 w-4" />
                       {t('admin.addAdmin')}
@@ -1644,7 +1667,7 @@ export default function AdminPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.role')}</label>
-                        <div className="flex gap-4">
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                           <label className="flex items-center gap-2 cursor-pointer">
                             <input
                               type="radio"
@@ -1704,36 +1727,36 @@ export default function AdminPage() {
                     {admins.map((admin) => (
                       <div
                         key={admin.id}
-                        className="flex items-center justify-between bg-[#111111] rounded-md border border-gray-800 p-4 hover:border-gray-700 transition-colors"
+                        className="flex items-center justify-between bg-[#111111] rounded-md border border-gray-800 p-3 md:p-4 hover:border-gray-700 transition-colors gap-2"
                       >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                          <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0 ${
                             admin.role === 'super_admin'
                               ? 'bg-yellow-500/10'
                               : 'bg-blue-500/10'
                           }`}>
-                            <span className={`text-sm font-bold ${
+                            <span className={`text-xs md:text-sm font-bold ${
                               admin.role === 'super_admin' ? 'text-yellow-400' : 'text-blue-400'
                             }`}>
                               {admin.username.charAt(0).toUpperCase()}
                             </span>
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-white font-semibold text-sm">{admin.username}</p>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-white font-semibold text-sm truncate">{admin.username}</p>
                               {admin.username === currentAdmin?.username && (
                                 <span className="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded font-semibold">{t('admin.you')}</span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              <span className={`text-[10px] md:text-xs font-medium px-2 py-0.5 rounded ${
                                 admin.role === 'super_admin'
                                   ? 'bg-yellow-500/10 text-yellow-400'
                                   : 'bg-blue-500/10 text-blue-400'
                               }`}>
                                 {admin.role === 'super_admin' ? t('admin.superAdmin') : t('admin.adminRole')}
                               </span>
-                              <span className="text-gray-600 text-xs">
+                              <span className="text-gray-600 text-[10px] md:text-xs">
                                 {t('admin.created')} {new Date(admin.createdAt).toLocaleDateString()}
                               </span>
                             </div>
@@ -1742,7 +1765,7 @@ export default function AdminPage() {
                         {admin.username !== currentAdmin?.username && (
                           <button
                             onClick={() => handleDeleteAdmin(admin.id, admin.username)}
-                            className="p-2 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors"
+                            className="p-2 text-gray-600 hover:text-[#DC2626] hover:bg-red-500/10 rounded transition-colors shrink-0"
                             title={t('admin.deleteAdmin')}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -1761,8 +1784,8 @@ export default function AdminPage() {
               )}
 
               {/* Store Information */}
-              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-6 md:p-8">
-                <h3 className="text-white font-bold text-lg mb-6">{t('admin.storeInfo')}</h3>
+              <div className="bg-[#1A1A1A] rounded-md border border-gray-800 p-4 md:p-6 lg:p-8">
+                <h3 className="text-white font-bold text-lg mb-4 md:mb-6">{t('admin.storeInfo')}</h3>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-300 mb-2">{t('admin.storeName')}</label>
@@ -1795,7 +1818,7 @@ export default function AdminPage() {
               </div>
 
               {/* Danger Zone */}
-              <div className="bg-red-500/5 rounded-md border border-red-500/20 p-6">
+              <div className="bg-red-500/5 rounded-md border border-red-500/20 p-4 md:p-6">
                 <h3 className="text-red-400 font-bold text-lg mb-2">{t('admin.dangerZone')}</h3>
                 <p className="text-gray-400 text-sm mb-4">
                   {t('admin.dangerDesc')}

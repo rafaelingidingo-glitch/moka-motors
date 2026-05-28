@@ -326,7 +326,8 @@
     "imageTooLarge": "File too large. Maximum size is 5MB.",
     "uploadFailed": "Upload failed. Please try again.",
     "imageUrlAdded": "Image URL added!",
-    "enterImageUrl": "Please enter an image URL"
+    "enterImageUrl": "Please enter an image URL",
+    "search": "Search..."
   },
   "meta": {
     "title": "Moka Motors - Premium Motorbikes & Spare Parts | Dar es Salaam",
