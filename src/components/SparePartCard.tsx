@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useCartStore } from '@/store/cartStore'
 import { useLikeStore } from '@/store/likeStore'
 import { getProductInquiryMessage, getWhatsAppUrl } from '@/lib/whatsapp'
-import { ShoppingCart, Star, MessageCircle, Settings, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ShoppingCart, Star, Settings, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import ProductDetailModal from './ProductDetailModal'
 
@@ -218,8 +218,7 @@ export default function SparePartCard({ part }: { part: SparePart }) {
               onClick={(e) => e.stopPropagation()}
               className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2.5 rounded-sm transition-colors flex items-center gap-1.5"
             >
-              <MessageCircle className="h-4 w-4" />
-              Buy Now
+                Buy Now
             </a>
           </div>
         </div>

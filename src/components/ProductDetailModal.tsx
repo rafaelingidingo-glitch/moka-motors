@@ -11,7 +11,6 @@ import { useLikeStore } from '@/store/likeStore'
 import { getProductInquiryMessage, getWhatsAppUrl } from '@/lib/whatsapp'
 import {
   ShoppingCart,
-  MessageCircle,
   Calendar,
   Cog,
   Gauge,
@@ -346,7 +345,6 @@ export default function ProductDetailModal({
                 rel="noopener noreferrer"
                 className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-5 py-3 rounded-sm transition-colors flex items-center gap-2"
               >
-                <MessageCircle className="h-4 w-4" />
                 Buy Now
               </a>
             </div>

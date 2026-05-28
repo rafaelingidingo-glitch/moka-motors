@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Plus, Minus, ShoppingBag, MessageCircle } from 'lucide-react'
+import { X, Plus, Minus, ShoppingBag } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { getCartCheckoutMessage, getWhatsAppUrl } from '@/lib/whatsapp'
 
@@ -136,7 +136,6 @@ export default function CartPanel() {
                   onClick={handleCheckout}
                   className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
-                  <MessageCircle className="h-5 w-5" />
                   Checkout via WhatsApp
                 </button>
                 <button
