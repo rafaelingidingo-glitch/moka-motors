@@ -89,12 +89,12 @@ export default function HeroSection() {
             className="flex items-center gap-4 sm:gap-8 mt-12 pt-8 border-t border-white/10"
           >
             <div>
-              <p className="text-3xl font-black text-white">10+</p>
+              <p className="text-3xl font-black text-white">500+</p>
               <p className="text-gray-400 text-sm mt-1">{t('hero.statsMotorbikes')}</p>
             </div>
             <div className="w-px h-12 bg-white/10" />
             <div>
-              <p className="text-3xl font-black text-white">100+</p>
+              <p className="text-3xl font-black text-white">800+</p>
               <p className="text-gray-400 text-sm mt-1">{t('hero.statsSpareParts')}</p>
             </div>
             <div className="w-px h-12 bg-white/10" />
