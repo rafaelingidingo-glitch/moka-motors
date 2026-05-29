@@ -560,7 +560,7 @@ export default function AdminPage() {
     if (!file) return
 
     // Validate size
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 10 * 1024 * 1024) {
       toast.error(t('admin.imageTooLarge'))
       return
     }

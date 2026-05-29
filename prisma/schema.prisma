@@ -18,11 +18,12 @@ model Motorbike {
   mileage     String?
   color       String?
   description String
-  images      String   @default("[]")
+ images      String   @default("[]") @db.Text
   featured    Boolean  @default(false)
   isNewStock  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
 }
 
 model SparePart {
@@ -33,7 +34,7 @@ model SparePart {
   compatibility String
   price         Float
   description   String
-  images        String   @default("[]")
+  images      String   @default("[]") @db.Text
   inStock       Boolean  @default(true)
   featured      Boolean  @default(false)
   createdAt     DateTime @default(now())

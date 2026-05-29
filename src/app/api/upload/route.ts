@@ -49,20 +49,13 @@ export async function POST(request: NextRequest) {
 
     const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${safeExt}`
 
-    // Ensure uploads directory exists
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
-    }
-
-    const filePath = path.join(uploadsDir, uniqueName)
-    await writeFile(filePath, buffer)
-
-    const imageUrl = `/uploads/${uniqueName}`
+    // ✅ PASTE THIS INSTEAD:
+// Convert the file bytes into a browser-readable Base64 data string
+const dataUrl = `data:${file.type};base64,${buffer.toString('base64')}`
 
     return NextResponse.json({
       success: true,
-      url: imageUrl,
+      url: dataUrl,
       name: file.name,
       size: file.size,
       type: file.type,
