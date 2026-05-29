@@ -203,7 +203,7 @@ export default function ContactSection() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/30 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="relative">
                 <div className="flex items-center gap-3 mb-3">
-                  <MessageCircle className="h-7 w-7" />
+                  {/* <MessageCircle className="h-7 w-7" /> */}
                   <h3 className="text-xl font-black">{t('contact.whatsappUs')}</h3>
                 </div>
                 <p className="text-green-100 text-sm mb-4">

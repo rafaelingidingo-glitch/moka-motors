@@ -43,9 +43,9 @@
   },
   "newStock": {
     "tag": "HIFADHI MPYA",
-    "heading1": "Stoki Mpya",
-    "heading2": "Inapatikana",
-    "description": "Tazama Pikipiki Mpya zilizoingia Dukani kwetu hivi karibuni.Zipo  tayar kwa Kuendeshwa",
+    "heading1": "Stoki",
+    "heading2": "Mpya",
+    "description": "Tazama Pikipiki Mpya zilizoingia Dukani kwetu hivi karibuni.",
     "badge": "MPYA",
     "addToCart": "Weka kwenye kikapu",
     "buyNow": "Nunua Sasa",
@@ -53,11 +53,11 @@
     "addedToCart": "{name} imewekwa kwenye kikapu!"
   },
   "motorbikes": {
-    "tag": "MKUSANYO WETU",
+    "tag": "STOKI YETU ",
     "heading1": "Chagua",
     "heading2": "Pikipiki",
     "description": "Tazama hifadhi yetu kamili ya pikipiki bora kutoka brand bora. Tumia vichujio kupata pikipiki yako kamili.",
-    "searchResults": "Utafutaji wako umetoa",
+    "searchResults": "Utafutaji wako umeleta",
     "resultsWord": "matokeo",
     "sortNewest": "Mpya Zaidi Kwanza",
     "sortPriceLow": "Bei: Chini hadi Juu",
